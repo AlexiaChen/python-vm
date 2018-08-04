@@ -1,7 +1,9 @@
 #ifndef _HI_STRING_HPP
 #define _HI_STRING_HPP
 
-class HiString {
+#include "hiObject.hpp"
+
+class HiString : public HiObject {
 private:
     char* _value;
     int   _length;
