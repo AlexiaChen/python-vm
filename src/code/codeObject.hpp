@@ -1,7 +1,7 @@
 #ifndef CODE_OBJECT_HPP
 #define CODE_OBJECT_HPP
 
-#include "hiObject.hpp"
+#include "object/hiObject.hpp"
 
 class HiString;
 

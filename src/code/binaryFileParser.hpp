@@ -1,12 +1,12 @@
 #ifndef BINARY_FILE_PARSER_HPP
 #define BINARY_FILE_PARSER_HPP
 
-#include "bufferedInputStream.hpp"
-#include "arrayList.hpp"
-#include "hiObject.hpp"
-#include "hiInteger.hpp"
-#include "hiString.hpp"
-#include "codeObject.hpp"
+#include "util/bufferedInputStream.hpp"
+#include "util/arrayList.hpp"
+#include "object/hiObject.hpp"
+#include "object/hiInteger.hpp"
+#include "object/hiString.hpp"
+#include "code/codeObject.hpp"
 
 class BinaryFileParser {
 private:

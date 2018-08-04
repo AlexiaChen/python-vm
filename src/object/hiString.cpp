@@ -1,4 +1,4 @@
-#include "hiString.hpp"
+#include "object/hiString.hpp"
 #include <string.h>
 
 HiString::HiString(const char* x) {
