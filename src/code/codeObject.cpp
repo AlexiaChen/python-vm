@@ -1,4 +1,4 @@
-#include "codeObject.hpp"
+#include "code/codeObject.hpp"
 
 CodeObject::CodeObject(int argcount, int nlocals, int stacksize, int flag, HiString* bytecodes,
     ArrayList<HiObject*>* consts, ArrayList<HiObject*>* names, ArrayList<HiObject*>* varnames, 

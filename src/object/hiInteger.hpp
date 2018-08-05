@@ -1,7 +1,7 @@
 #ifndef _HI_INTEGER_HPP
 #define _HI_INTEGER_HPP
 
-#include "hiObject.hpp"
+#include "object/hiObject.hpp"
 
 class HiInteger : public HiObject {
 private:
