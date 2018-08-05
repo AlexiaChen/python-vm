@@ -10,6 +10,9 @@ private:
 public:
     HiInteger(int x);
     int value() { return _value; }
+
+    virtual void print();
+    virtual HiObject* add(HiObject* x);
 };
 
 #endif
