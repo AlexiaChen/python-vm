@@ -1,5 +1,7 @@
 #include "runtime/interpreter.hpp"
+#include "runtime/universe.hpp"
 #include "util/arrayList.hpp"
+#include "util/map.hpp"
 #include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
 
@@ -17,6 +19,8 @@ void Interpreter::run(CodeObject* codes) {
 
     _stack  = new ArrayList<HiObject*>(codes->_stack_size);
     _consts = codes->_consts;
+    ArrayList<HiObject*>* names  = codes->_names;
+    Map<HiObject*, HiObject*>* locals  = new Map<HiObject*, HiObject*>();
 
     while (pc < code_length) {
         unsigned char op_code = codes->_bytecodes->value()[pc++];
@@ -28,12 +32,27 @@ void Interpreter::run(CodeObject* codes) {
             op_arg = ((codes->_bytecodes->value()[pc++] & 0xFF) << 8) | byte1;
         }
 
-        HiInteger* lhs, * rhs;
         HiObject* v, * w, * u, * attr;
 
         switch (op_code) {
             case ByteCode::LOAD_CONST:
                 PUSH(_consts->get(op_arg));
+                break;
+
+            case ByteCode::LOAD_NAME:
+                v = names->get(op_arg);
+                w = locals->get(v);
+                if (w != Universe::HiNone) {
+                    PUSH(w);
+                    break;
+                }
+
+                PUSH(Universe::HiNone);
+                break;
+
+            case ByteCode::STORE_NAME:
+                v = names->get(op_arg);
+                locals->put(v, POP());
                 break;
 
             case ByteCode::PRINT_ITEM:
@@ -92,7 +111,7 @@ void Interpreter::run(CodeObject* codes) {
 
             case ByteCode::POP_JUMP_IF_FALSE:
                 v = POP();
-                if (((HiInteger*)v)->value() == 0)
+                if (v == Universe::HiFalse)
                     pc = op_arg;
                 break;
 
@@ -100,6 +119,15 @@ void Interpreter::run(CodeObject* codes) {
                 pc += op_arg;
                 break;
 
+            case ByteCode::JUMP_ABSOLUTE:
+                pc = op_arg;
+                break;
+
+            case ByteCode::SETUP_LOOP:
+                break;
+
+            case ByteCode::POP_BLOCK:
+                break;
 
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
