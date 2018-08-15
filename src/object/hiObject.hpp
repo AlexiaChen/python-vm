@@ -1,17 +1,31 @@
 #ifndef _HI_OBJECT_HPP
 #define _HI_OBJECT_HPP
 
-class HiObject {
-public:
-    virtual void print() {}
+#include "object/klass.hpp"
+#include <assert.h>
 
-    virtual HiObject* add(HiObject* x){}
-    virtual HiObject* greater  (HiObject* x) {};
-    virtual HiObject* less     (HiObject* x) {};
-    virtual HiObject* equal    (HiObject* x) {};
-    virtual HiObject* not_equal(HiObject* x) {};
-    virtual HiObject* ge       (HiObject* x) {};
-    virtual HiObject* le       (HiObject* x) {};
+class HiObject {
+private:
+    Klass*  _klass;
+
+public:
+    Klass* klass()             { assert(_klass != NULL); return _klass; }
+    void set_klass(Klass* x)   { _klass = x; }
+
+    void print();
+
+    HiObject* add(HiObject* x);
+    HiObject* sub(HiObject* x);
+    HiObject* mul(HiObject* x);
+    HiObject* div(HiObject* x);
+    HiObject* mod(HiObject* x);
+
+    HiObject* greater  (HiObject* x);
+    HiObject* less     (HiObject* x);
+    HiObject* equal    (HiObject* x);
+    HiObject* not_equal(HiObject* x);
+    HiObject* ge       (HiObject* x);
+    HiObject* le       (HiObject* x);
 };
 
 #endif
