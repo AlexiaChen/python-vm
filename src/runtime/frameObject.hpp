@@ -5,6 +5,8 @@
 #include "util/map.hpp"
 #include "util/arrayList.hpp"
 
+class FunctionObject;
+
 class Block {
 public:
     unsigned char _type;
@@ -35,6 +37,7 @@ public:
 class FrameObject {
 public:
     FrameObject(CodeObject* codes);
+    FrameObject(FunctionObject* func);
     ~FrameObject();
 
     ArrayList<HiObject*>* _stack;
@@ -46,9 +49,12 @@ public:
     Map<HiObject*, HiObject*>* _locals;
 
     CodeObject*           _codes;
+    FrameObject*          _sender;
     int                   _pc;
 
 public:
+    void set_sender(FrameObject* x) { _sender = x; }
+    FrameObject* sender()           { return _sender;}
     void set_pc(int x)              { _pc = x; }
     int  get_pc()                   { return _pc; }
 

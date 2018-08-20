@@ -14,6 +14,7 @@ ADD_EXECUTABLE(railgun main.cpp
     runtime/interpreter.cpp
     runtime/universe.cpp
     runtime/frameObject.cpp
+    runtime/functionObject.cpp
     code/binaryFileParser.cpp
     code/codeObject.cpp)
     
