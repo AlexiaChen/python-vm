@@ -14,6 +14,15 @@ FunctionKlass* FunctionKlass::get_instance() {
 FunctionKlass::FunctionKlass() {
 }
 
+void FunctionKlass::print(HiObject* obj) {
+    printf("<function : ");
+    FunctionObject* fo = static_cast<FunctionObject*>(obj);
+
+    assert(fo && fo->klass() == (Klass*) this);
+    fo->func_name()->print();
+    printf(">");
+}
+
 FunctionObject::FunctionObject(HiObject* code_object) {
     CodeObject* co = (CodeObject*) code_object;
 
@@ -23,13 +32,4 @@ FunctionObject::FunctionObject(HiObject* code_object) {
 
     set_klass(FunctionKlass::get_instance());
 }
-
-void FunctionKlass::print(HiObject* obj) {
-    printf("native function : ");
-    FunctionObject* fo = static_cast<FunctionObject*>(obj);
-
-    assert(fo && fo->klass() == (Klass*) this);
-    fo->func_name()->print();
-}
-
 
