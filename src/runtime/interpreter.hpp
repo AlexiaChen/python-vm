@@ -15,6 +15,7 @@ public:
 
     void run(CodeObject* codes);
     void build_frame(HiObject* callable);
+    void leave_frame(HiObject* ret_value);
 };
 
 #endif
