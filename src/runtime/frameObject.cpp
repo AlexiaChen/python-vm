@@ -8,6 +8,7 @@ FrameObject::FrameObject(CodeObject* codes) {
     _names   = codes->_names;
     
     _locals  = new Map<HiObject*, HiObject*>();
+    _globals = _locals;
 
     _stack   = new ArrayList<HiObject*>();
     _loop_stack  = new ArrayList<Block*>();
@@ -23,6 +24,7 @@ FrameObject::FrameObject (FunctionObject* func) {
     _names   = _codes->_names;
 
     _locals  = new Map<HiObject*, HiObject*>();
+    _globals = func->_globals;
 
     _stack   = new ArrayList<HiObject*>();
     _loop_stack  = new ArrayList<Block*>();

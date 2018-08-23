@@ -22,6 +22,7 @@ friend class FrameObject;
 private:
     CodeObject* _func_code;
     HiString*   _func_name;
+    Map<HiObject*, HiObject*>* _globals;
 
     unsigned int _flags;
 
@@ -37,6 +38,9 @@ public:
     
     HiString*  func_name()   { return _func_name; }
     int  flags()             { return _flags; }
+
+    Map<HiObject*, HiObject*>* globals() { return _globals; }
+    void set_globals(Map<HiObject*, HiObject*>* x) { _globals = x; }
 };
 
 #endif
