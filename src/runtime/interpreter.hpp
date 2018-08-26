@@ -8,7 +8,8 @@ class FrameObject;
 
 class Interpreter {
 private:
-    FrameObject* _frame;
+    Map<HiObject*, HiObject*>*    _builtins;
+    FrameObject*                  _frame;
 
 public:
     Interpreter();

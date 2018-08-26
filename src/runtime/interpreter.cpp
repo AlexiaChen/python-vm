@@ -13,7 +13,15 @@
 #define POP()         _frame->stack()->pop()
 #define STACK_LEVEL() _frame->stack()->size()
 
+#define HI_TRUE       Universe::HiTrue
+#define HI_FALSE      Universe::HiFalse
+
 Interpreter::Interpreter() {
+    _builtins = new Map<HiObject*, HiObject*>();
+
+    _builtins->put(new HiString("True"),     Universe::HiTrue);
+    _builtins->put(new HiString("False"),    Universe::HiFalse);
+    _builtins->put(new HiString("None"),     Universe::HiNone);
 }
 
 void Interpreter::build_frame(HiObject* callable) {
@@ -70,6 +78,12 @@ void Interpreter::run(CodeObject* codes) {
                 }
 
                 w = _frame->globals()->get(v);
+                if (w != Universe::HiNone) {
+                    PUSH(w);
+                    break;
+                }
+
+                w = _builtins->get(v);
                 if (w != Universe::HiNone) {
                     PUSH(w);
                     break;
@@ -153,6 +167,20 @@ void Interpreter::run(CodeObject* codes) {
                
                 case ByteCode::LESS_EQUAL: 
                     PUSH(v->le(w));
+                    break;
+
+                case ByteCode::IS:
+                    if (v == w)
+                        PUSH(HI_TRUE);
+                    else
+                        PUSH(HI_FALSE);
+                    break;
+
+                case ByteCode::IS_NOT:
+                    if (v == w)
+                        PUSH(HI_TRUE);
+                    else
+                        PUSH(HI_FALSE);
                     break;
 
                 default:
