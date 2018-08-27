@@ -15,7 +15,7 @@ public:
     Interpreter();
 
     void run(CodeObject* codes);
-    void build_frame(HiObject* callable);
+    void build_frame(HiObject* callable, ObjList args);
     void leave_frame(HiObject* ret_value);
 };
 
