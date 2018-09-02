@@ -38,6 +38,8 @@ public:
     virtual HiObject* mul(HiObject* x, HiObject* y) { return 0; }
     virtual HiObject* div(HiObject* x, HiObject* y) { return 0; }
     virtual HiObject* mod(HiObject* x, HiObject* y) { return 0; }
+
+    virtual HiObject* call(ArrayList<HiObject*>* args) { return 0; }
 };
 
 #endif

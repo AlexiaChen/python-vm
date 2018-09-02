@@ -15,6 +15,10 @@ public:
     virtual void print(HiObject* obj);
 };
 
+HiObject* len(ObjList args);
+
+typedef HiObject* (*NativeFuncPointer)(ObjList args);
+
 class FunctionObject : public HiObject {
 friend class FunctionKlass;
 friend class FrameObject;
@@ -25,10 +29,15 @@ private:
     Map<HiObject*, HiObject*>* _globals;
     ObjList     _defaults;
 
+    NativeFuncPointer _native_func;
+
     unsigned int _flags;
 
 public:
     FunctionObject(HiObject* code_object);
+
+    FunctionObject(NativeFuncPointer nfp);
+
     FunctionObject(Klass* klass) {
         _func_code = NULL;
         _func_name = NULL;
@@ -47,6 +56,17 @@ public:
 
     void set_default(ObjList defaults);
     ObjList defaults()       { return _defaults; }
+
+    HiObject*  call(ObjList args);
+};
+
+class NativeFunctionKlass : public Klass {
+private:
+    NativeFunctionKlass();
+    static NativeFunctionKlass* instance;
+
+public:
+    static NativeFunctionKlass* get_instance();
 };
 
 #endif

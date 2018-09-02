@@ -1,3 +1,4 @@
+#include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
@@ -29,8 +30,19 @@ FunctionObject::FunctionObject(HiObject* code_object) {
     _func_code = co;
     _func_name = co->_co_name;
     _flags     = co->_flag;
+    _globals   = NULL;
 
     set_klass(FunctionKlass::get_instance());
+}
+
+FunctionObject::FunctionObject(NativeFuncPointer nfp) {
+    _func_code = NULL;
+    _func_name = NULL;
+    _flags     = 0;
+    _globals   = NULL;
+    _native_func = nfp;
+
+    set_klass(NativeFunctionKlass::get_instance());
 }
 
 void FunctionObject::set_default(ArrayList<HiObject*>* defaults) {
@@ -46,3 +58,31 @@ void FunctionObject::set_default(ArrayList<HiObject*>* defaults) {
     }
 }
 
+/*
+ * Operations for native calls.
+ */
+
+NativeFunctionKlass* NativeFunctionKlass::instance = NULL;
+
+NativeFunctionKlass* NativeFunctionKlass::get_instance() {
+    if (instance == NULL)
+        instance = new NativeFunctionKlass();
+
+    return instance;
+}
+
+NativeFunctionKlass::NativeFunctionKlass() {
+    set_super(FunctionKlass::get_instance());
+}
+
+HiObject* len(ObjList args) {
+    HiObject* arg0 = args->get(0);
+    assert(arg0->klass() == StringKlass::get_instance());
+
+    return new HiInteger(((HiString*)arg0)->length());
+}
+
+
+HiObject* FunctionObject::call(ObjList args) {
+    return (*_native_func)(args);
+}
