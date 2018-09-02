@@ -108,6 +108,10 @@ void Interpreter::run(CodeObject* codes) {
                 _frame->locals()->put(v, POP());
                 break;
 
+            case ByteCode::STORE_FAST:
+                _frame->_fast_locals->set(op_arg, POP());
+                break;
+
             case ByteCode::STORE_GLOBAL:
                 v = _frame->names()->get(op_arg);
                 _frame->globals()->put(v, POP());
@@ -132,6 +136,19 @@ void Interpreter::run(CodeObject* codes) {
                 v = POP();
                 fo = new FunctionObject(v);
                 fo->set_globals(_frame->globals());
+                if (op_arg > 0) {
+                    args = new ArrayList<HiObject*>(op_arg);
+                    while (op_arg--) {
+                        args->set(op_arg, POP());
+                    }
+                }
+                fo->set_default(args);
+
+                if (args != NULL) {
+                    delete args;
+                    args = NULL;
+                }
+
                 PUSH(fo);
                 break;
 
