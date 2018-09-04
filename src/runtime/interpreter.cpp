@@ -30,6 +30,16 @@ void Interpreter::build_frame(HiObject* callable, ObjList args) {
     if (callable->klass() == NativeFunctionKlass::get_instance()) {
         PUSH(((FunctionObject*)callable)->call(args));
     }
+    else if (MethodObject::is_method(callable)) {
+        MethodObject* method = (MethodObject*) callable;
+        // return value is ignored here, because they are handled
+        // by other pathes.
+        if (!args) {
+            args = new ArrayList<HiObject*>(1);
+        }
+        args->insert(0, method->owner());
+        build_frame(method->func(), args);
+    }
     else if (callable->klass() == FunctionKlass::get_instance()) {
         FrameObject* frame = new FrameObject((FunctionObject*) callable, args);
         frame->set_sender(_frame);
@@ -119,6 +129,12 @@ void Interpreter::run(CodeObject* codes) {
                 }
 
                 PUSH(Universe::HiNone);
+                break;
+
+            case ByteCode::LOAD_ATTR:
+                v = POP();
+                w = _frame->_names->get(op_arg);
+                PUSH(v->getattr(w));
                 break;
 
             case ByteCode::STORE_NAME:

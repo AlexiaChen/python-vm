@@ -5,7 +5,7 @@
 
 class StringKlass : public Klass {
 private:
-    StringKlass() {}
+    StringKlass();
     static StringKlass* instance;
 
 public:

@@ -75,6 +75,65 @@ NativeFunctionKlass::NativeFunctionKlass() {
     set_super(FunctionKlass::get_instance());
 }
 
+HiObject* FunctionObject::call(ObjList args) {
+    return (*_native_func)(args);
+}
+
+/*
+ *  Operations for methods
+ *  Method is a wrapper for function.
+ */
+MethodKlass* MethodKlass::instance = NULL;
+
+MethodKlass* MethodKlass::get_instance() {
+    if (instance == NULL)
+        instance = new MethodKlass();
+
+    return instance;
+}
+
+MethodKlass::MethodKlass() {
+    set_klass_dict(new HiDict());
+    set_super(FunctionKlass::get_instance());
+}
+
+/*
+ * To check the type of a callable object.
+ */
+bool MethodObject::is_native(HiObject *x) {
+    Klass* k = x->klass();
+    if (k == (Klass*) NativeFunctionKlass::get_instance())
+        return true;
+
+    while (k->super() != NULL) {
+        k = k->super();
+        if (k == (Klass*) NativeFunctionKlass::get_instance())
+            return true;
+    }
+    return false;
+}
+
+bool MethodObject::is_method(HiObject *x) {
+    if (x->klass() == (Klass*) MethodKlass::get_instance())
+        return true;
+
+    return false;
+}
+
+bool MethodObject::is_function(HiObject *x) {
+    Klass* k = x->klass();
+    if (k == (Klass*) FunctionKlass::get_instance())
+        return true;
+
+    while (k->super() != NULL) {
+        k = k->super();
+        if (k == (Klass*) FunctionKlass::get_instance())
+            return true;
+    }
+
+    return false;
+}
+
 HiObject* len(ObjList args) {
     HiObject* arg0 = args->get(0);
     assert(arg0->klass() == StringKlass::get_instance());
@@ -82,7 +141,25 @@ HiObject* len(ObjList args) {
     return new HiInteger(((HiString*)arg0)->length());
 }
 
+HiObject* string_upper(ObjList args) {
+    HiObject* arg0 = args->get(0);
+    assert(arg0->klass() == StringKlass::get_instance());
 
-HiObject* FunctionObject::call(ObjList args) {
-    return (*_native_func)(args);
+    HiString* str_obj = (HiString*)arg0;
+
+    int length = str_obj->length();
+    if (length <= 0)
+        return Universe::HiNone;
+
+    char* v = new char[length];
+    char c;
+    for (int i = 0; i < length; i++) {
+        c = str_obj->value()[i];
+        if (c >= 'a' && c <= 'z')
+            v[i] = c - 0x20;
+        else
+            v[i] = c;
+    }
+
+    return new HiString(v, length);
 }

@@ -1,4 +1,6 @@
 #include "object/hiObject.hpp"
+#include "runtime/universe.hpp"
+#include "runtime/functionObject.hpp"
 
 void HiObject::print() {
     klass()->print(this);
@@ -46,5 +48,20 @@ HiObject* HiObject::ge(HiObject * rhs) {
 
 HiObject* HiObject::le(HiObject * rhs) {
     return klass()->le(this, rhs);
+}
+
+HiObject* HiObject::getattr(HiObject* x) {
+    HiObject* result = Universe::HiNone;
+
+    result = klass()->klass_dict()->get(x);
+
+    if (result == Universe::HiNone)
+        return result;
+
+    // Only klass attribute needs bind.
+    if (MethodObject::is_function(result)) {
+        result = new MethodObject((FunctionObject*)result, this);
+    }
+    return result;
 }
 

@@ -16,6 +16,7 @@ public:
 };
 
 HiObject* len(ObjList args);
+HiObject* string_upper(ObjList args);
 
 typedef HiObject* (*NativeFuncPointer)(ObjList args);
 
@@ -58,6 +59,41 @@ public:
     ObjList defaults()       { return _defaults; }
 
     HiObject*  call(ObjList args);
+};
+
+// Method objects.
+class MethodKlass : public Klass {
+private:
+    MethodKlass();
+    static MethodKlass* instance;
+
+public:
+    static MethodKlass* get_instance();
+};
+
+class MethodObject : public HiObject {
+friend class MethodKlass;
+
+private:
+    HiObject* _owner;
+    FunctionObject* _func;
+
+public:
+    MethodObject(FunctionObject* func) : _owner(NULL), _func(func) {
+        set_klass(MethodKlass::get_instance());
+    }
+
+    MethodObject(FunctionObject* func, HiObject* owner) : _owner(owner), _func(func) {
+        set_klass(MethodKlass::get_instance());
+    }
+
+    void set_owner(HiObject * x)   { _owner = x; }
+    HiObject* owner()              { return _owner; }
+    FunctionObject* func()         { return _func; }
+
+    static bool is_native(HiObject* x);
+    static bool is_method(HiObject* x);
+    static bool is_function(HiObject* x);
 };
 
 class NativeFunctionKlass : public Klass {

@@ -7,13 +7,13 @@
 
 class HiObject;
 class HiString;
-class HiDict;
 class OopClosure;
 
 class Klass {
 private:
     Klass*        _super;
     HiString*     _name;
+    HiDict*       _klass_dict;
 
 public:
     Klass() {};
@@ -23,6 +23,9 @@ public:
 
     void set_name(HiString* x)            { _name = x; }
     HiString* name()                      { return _name; }
+
+    void set_klass_dict(HiDict* dict)     { _klass_dict = dict; }
+    HiDict* klass_dict()                  { return _klass_dict; }
 
     virtual void print(HiObject* obj) {};
 
