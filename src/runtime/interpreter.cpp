@@ -6,6 +6,7 @@
 #include "util/map.hpp"
 #include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
+#include "object/hiList.hpp"
 
 #include <string.h>
 
@@ -290,6 +291,14 @@ void Interpreter::run(CodeObject* codes) {
                     POP();
                 }
                 _frame->set_pc(b->_target);
+                break;
+
+            case ByteCode::BUILD_LIST:
+                v = new HiList();
+                while (op_arg--) {
+                    ((HiList*)v)->set(op_arg, POP());
+                }
+                PUSH(v);
                 break;
 
             default:
