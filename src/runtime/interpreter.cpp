@@ -244,6 +244,10 @@ void Interpreter::run(CodeObject* codes) {
                     PUSH(v->le(w));
                     break;
 
+                case ByteCode::IN:
+                    PUSH(v->contains(w));
+                    break;
+
                 case ByteCode::IS:
                     if (v == w)
                         PUSH(HI_TRUE);

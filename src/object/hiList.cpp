@@ -48,6 +48,19 @@ HiObject* ListKlass::subscr(HiObject* x, HiObject* y) {
     return lx->inner_list()->get(iy->value());
 }
 
+HiObject* ListKlass::contains(HiObject* x, HiObject* y) {
+    HiList * lx = (HiList*)x;
+    assert(lx && lx->klass() == (Klass*) this);
+
+    int size = lx->_inner_list->size();
+    for (int i = 1; i < size; i++) {
+        if (lx->_inner_list->get(i)->equal(y))
+            return Universe::HiTrue;
+    }
+
+    return Universe::HiFalse;
+}
+
 HiObject* ListKlass::iter(HiObject* x) {
     return Universe::HiNone;
 }
