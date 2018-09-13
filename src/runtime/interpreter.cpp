@@ -152,6 +152,12 @@ void Interpreter::run(CodeObject* codes) {
                 _frame->globals()->put(v, POP());
                 break;
 
+            case ByteCode::BINARY_SUBSCR:
+                v = POP();
+                w = POP();
+                PUSH(w->subscr(v));
+                break;
+
             case ByteCode::PRINT_ITEM:
                 v = POP();
                 v->print();
