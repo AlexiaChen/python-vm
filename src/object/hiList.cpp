@@ -48,6 +48,16 @@ HiObject* ListKlass::subscr(HiObject* x, HiObject* y) {
     return lx->inner_list()->get(iy->value());
 }
 
+void ListKlass::store_subscr(HiObject* x, HiObject* y, HiObject* z) {
+    assert(x && x->klass() == (Klass*) this);
+    assert(y && y->klass() == IntegerKlass::get_instance());
+
+    HiList * lx = (HiList*)x;
+    HiInteger* iy = (HiInteger*)y;
+    
+    lx->inner_list()->set(iy->value(), z);
+}
+
 HiObject* ListKlass::contains(HiObject* x, HiObject* y) {
     HiList * lx = (HiList*)x;
     assert(lx && lx->klass() == (Klass*) this);

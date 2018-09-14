@@ -43,6 +43,7 @@ public:
     virtual HiObject* mod(HiObject* x, HiObject* y) { return 0; }
 
     virtual HiObject* subscr   (HiObject* x, HiObject* y) { return 0; }
+    virtual void store_subscr  (HiObject* x, HiObject* y, HiObject* z) { return; }
     virtual HiObject* contains (HiObject* x, HiObject* y) { return 0; }
 
     virtual HiObject* call(ArrayList<HiObject*>* args) { return 0; }

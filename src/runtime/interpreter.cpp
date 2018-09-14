@@ -68,7 +68,7 @@ void Interpreter::run(CodeObject* codes) {
     Block* b;
     FunctionObject* fo;
     ArrayList<HiObject*>* args = NULL;
-    HiObject* v, * w;
+    HiObject *v, *w, *u;
 
     while (_frame->has_more_codes()) {
         unsigned char op_code = _frame->get_op_code();
@@ -150,6 +150,13 @@ void Interpreter::run(CodeObject* codes) {
             case ByteCode::STORE_GLOBAL:
                 v = _frame->names()->get(op_arg);
                 _frame->globals()->put(v, POP());
+                break;
+
+            case ByteCode::STORE_SUBSCR:
+                u = POP();
+                v = POP();
+                w = POP();
+                v->store_subscr(u, w);
                 break;
 
             case ByteCode::BINARY_SUBSCR:

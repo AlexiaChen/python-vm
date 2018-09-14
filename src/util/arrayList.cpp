@@ -21,7 +21,7 @@ template <typename T>
 void ArrayList<T>::insert(int index, T t) {
     add(NULL);
 
-    for (int i = _size; i > index; i--) {
+    for (int i = _size - 1; i > index; i--) {
         _array[i] = _array[i - 1];
     }
 
@@ -34,8 +34,8 @@ void ArrayList<T>::expand() {
     for (int i = 0; i < _length; i++) {
         new_array[i] = _array[i];
     }
-    _array = new_array;
     delete[] _array;
+    _array = new_array;
 
     _length <<= 1;
     printf("expand an array to %d, size is %d\n", _length, _size);
