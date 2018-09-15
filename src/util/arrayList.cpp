@@ -72,6 +72,14 @@ T ArrayList<T>::pop() {
     return _array[--_size];
 }
 
+template <typename T>
+void ArrayList<T>::delete_index(int index) {
+    for (int i = index; i + 1 < _size; i++) {
+        _array[i] = _array[i+1];
+    }
+    _size--;
+}
+
 class HiObject;
 template class ArrayList<HiObject*>;
 

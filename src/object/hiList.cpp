@@ -18,6 +18,10 @@ ListKlass::ListKlass() {
     HiDict * klass_dict = new HiDict();
     klass_dict->put(new HiString("append"), 
         new FunctionObject(list_append));
+    klass_dict->put(new HiString("pop"), 
+        new FunctionObject(list_pop));
+    klass_dict->put(new HiString("remove"), 
+        new FunctionObject(list_remove));
     set_klass_dict(klass_dict);
 }
 
@@ -58,6 +62,16 @@ void ListKlass::store_subscr(HiObject* x, HiObject* y, HiObject* z) {
     lx->inner_list()->set(iy->value(), z);
 }
 
+void ListKlass::del_subscr(HiObject* x, HiObject* y) {
+    assert(x && x->klass() == (Klass*) this);
+    assert(y && y->klass() == IntegerKlass::get_instance());
+
+    HiList * lx = (HiList*)x;
+    HiInteger* iy = (HiInteger*)y;
+    
+    lx->inner_list()->delete_index(iy->value());
+}
+
 HiObject* ListKlass::contains(HiObject* x, HiObject* y) {
     HiList * lx = (HiList*)x;
     assert(lx && lx->klass() == (Klass*) this);
@@ -87,6 +101,27 @@ HiList::HiList(ObjList ol) {
 
 HiObject* list_append(ObjList args) {
     ((HiList*)(args->get(0)))->append(args->get(1));
+    return Universe::HiNone;
+}
+
+HiObject* list_pop(ObjList args) {
+    HiList* list = (HiList*)(args->get(0));
+    assert(list && list->klass() == ListKlass::get_instance());
+    return list->pop();
+}
+
+HiObject* list_remove(ObjList args) {
+    HiList* list = (HiList*)(args->get(0));
+    HiObject* target = (HiObject*)(args->get(1));
+
+    assert(list && list->klass() == ListKlass::get_instance());
+
+    for (int i = 0; i < list->inner_list()->size(); i++) {
+        if (list->get(i)->equal(target) == (HiObject*)Universe::HiTrue) {
+            list->inner_list()->delete_index(i);
+        }
+    }
+
     return Universe::HiNone;
 }
 

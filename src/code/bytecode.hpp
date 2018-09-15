@@ -23,6 +23,7 @@ public:
     static const unsigned char INPLACE_DIVIDE = 58;
     static const unsigned char INPLACE_MODULO = 59;
     static const unsigned char STORE_SUBSCR = 60;
+    static const unsigned char DELETE_SUBSCR = 61;
 
     static const unsigned char GET_ITER = 68;
 

@@ -31,6 +31,7 @@ public:
 
     HiObject* subscr(HiObject* x);
     void      store_subscr(HiObject* x, HiObject* y); 
+    void      del_subscr(HiObject* x); 
     HiObject* contains(HiObject* x);
 };
 

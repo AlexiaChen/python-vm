@@ -275,6 +275,12 @@ void Interpreter::run(CodeObject* codes) {
                 }
                 break;
 
+            case ByteCode::DELETE_SUBSCR:
+                w = POP();
+                v = POP();
+                v->del_subscr(w);
+                break;
+
             case ByteCode::POP_JUMP_IF_FALSE:
                 v = POP();
                 if (v == Universe::HiFalse)
