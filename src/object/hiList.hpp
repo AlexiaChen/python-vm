@@ -5,7 +5,6 @@
 #include "object/hiObject.hpp"
 #include "util/arrayList.hpp"
 
-class HiObject;
 class OopClosure;
 
 class ListKlass : public Klass {
@@ -23,17 +22,6 @@ public:
     virtual HiObject* contains (HiObject* x, HiObject* y);
     virtual HiObject* less     (HiObject* x, HiObject* y);
     virtual HiObject* iter(HiObject* x);
-};
-
-class ListIteratorKlass : public Klass {
-private:
-    static ListIteratorKlass* instance;
-    ListIteratorKlass() {}
-
-public:
-    static ListIteratorKlass* get_instance();
-
-    virtual HiObject* next(HiObject* x);
 };
 
 class HiList : public HiObject {
@@ -60,5 +48,28 @@ HiObject* list_pop(ObjList args);
 HiObject* list_remove(ObjList args);
 HiObject* list_reverse(ObjList args);
 HiObject* list_sort(ObjList args);
+
+class ListIteratorKlass : public Klass {
+private:
+    static ListIteratorKlass* instance;
+    ListIteratorKlass();
+
+public:
+    static ListIteratorKlass* get_instance();
+};
+
+class ListIterator : public HiObject {
+private:
+    HiList*   _owner;
+    int       _iter_cnt;
+public:
+    ListIterator(HiList* owner);
+
+    HiList* owner()        { return _owner; }
+    int iter_cnt()         { return _iter_cnt; }  
+    void inc_cnt()         { _iter_cnt++; }
+};
+
+HiObject* listiterator_next(ObjList args);
 
 #endif

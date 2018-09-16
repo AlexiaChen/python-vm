@@ -6,6 +6,7 @@
 #include "util/arrayList.hpp"
 
 class FunctionObject;
+class HiList;
 
 class Block {
 public:
@@ -40,7 +41,7 @@ public:
     FrameObject(FunctionObject* func, ObjList args);
     ~FrameObject() {};
 
-    ArrayList<HiObject*>* _stack;
+    HiList* _stack;
     ArrayList<Block*>*    _loop_stack;
 
     ArrayList<HiObject*>* _consts;
@@ -60,7 +61,7 @@ public:
     void set_pc(int x)              { _pc = x; }
     int  get_pc()                   { return _pc; }
 
-    ArrayList<HiObject*>* stack()                 { return _stack; }
+    HiList* stack()                 { return _stack; }
     ArrayList<Block*>* loop_stack()               { return _loop_stack; }
     ArrayList<HiObject*>* consts()                { return _consts; }
     ArrayList<HiObject*>* names()                 { return _names; }

@@ -50,6 +50,8 @@ public:
     virtual HiObject* contains (HiObject* x, HiObject* y) { return 0; }
 
     virtual HiObject* call(ArrayList<HiObject*>* args) { return 0; }
+
+    virtual HiObject* iter(HiObject* x) { return 0; }
 };
 
 #endif

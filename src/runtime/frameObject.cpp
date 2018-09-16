@@ -1,6 +1,7 @@
 #include "runtime/frameObject.hpp"
 #include "runtime/functionObject.hpp"
 #include "object/hiString.hpp"
+#include "object/hiList.hpp"
 
 // this constructor is used for module only.
 FrameObject::FrameObject(CodeObject* codes) {
@@ -11,7 +12,7 @@ FrameObject::FrameObject(CodeObject* codes) {
     _globals = _locals;
     _fast_locals = NULL;
 
-    _stack   = new ArrayList<HiObject*>();
+    _stack   = new HiList();
     _loop_stack  = new ArrayList<Block*>();
 
     _codes   = codes;
@@ -43,7 +44,7 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args) {
         }
     }
 
-    _stack   = new ArrayList<HiObject*>();
+    _stack   = new HiList();
     _loop_stack  = new ArrayList<Block*>();
 
     _pc      = 0;

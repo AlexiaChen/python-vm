@@ -10,8 +10,9 @@
 
 #include <string.h>
 
-#define PUSH(x)       _frame->stack()->add((x))
+#define PUSH(x)       _frame->stack()->append((x))
 #define POP()         _frame->stack()->pop()
+#define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
 
 #define HI_TRUE       Universe::HiTrue
@@ -322,6 +323,22 @@ void Interpreter::run(CodeObject* codes) {
                     ((HiList*)v)->set(op_arg, POP());
                 }
                 PUSH(v);
+                break;
+
+            case ByteCode::GET_ITER:
+                v = POP();
+                PUSH(v->iter());
+                break;
+
+            case ByteCode::FOR_ITER:
+                v = TOP();
+                w = v->getattr(new HiString("next"));
+                build_frame(w, NULL);
+
+                if (TOP() == NULL) {
+                    _frame->_pc += op_arg;
+                    POP();
+                }
                 break;
 
             default:
