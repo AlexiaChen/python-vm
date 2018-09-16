@@ -95,6 +95,38 @@ HiObject* ListKlass::iter(HiObject* x) {
     return Universe::HiNone;
 }
 
+HiObject* ListKlass::less(HiObject* x, HiObject* y) {
+    HiList * lx = (HiList*)x;
+    assert(lx && lx->klass() == (Klass*) this);
+
+    if (x->klass() != y->klass()) {
+        if (Klass::compare_klass(x->klass(), y->klass()) < 0)
+            return Universe::HiTrue;
+        else
+            return Universe::HiFalse;
+    }
+
+    HiList * ly = (HiList*)y;
+    assert(ly && ly->klass() == (Klass*) this);
+
+    int len = lx->size() < ly->size() ?
+        lx->size() : ly->size();
+
+    for (int i = 0; i < len; i++) {
+        if (lx->get(i)->less(ly->get(i)) == Universe::HiTrue) {
+            return Universe::HiTrue;
+        }
+        else if (lx->get(i)->equal(ly->get(i)) != Universe::HiTrue) {
+            return Universe::HiFalse;
+        }
+    }
+
+    if (lx->size() < ly->size())
+        return Universe::HiTrue;
+
+    return Universe::HiFalse;
+}
+
 HiList::HiList() {
     set_klass(ListKlass::get_instance());
     _inner_list = new ArrayList<HiObject*>();
