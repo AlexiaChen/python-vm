@@ -57,5 +57,6 @@ public:
 HiObject* list_append(ObjList args);
 HiObject* list_pop(ObjList args);
 HiObject* list_remove(ObjList args);
+HiObject* list_reverse(ObjList args);
 
 #endif
