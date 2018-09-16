@@ -14,6 +14,7 @@ public:
     virtual HiObject* equal    (HiObject* x, HiObject* y);
 
     virtual void print(HiObject* obj);
+    virtual HiObject* less   (HiObject* x, HiObject* y);
     virtual HiObject* subscr (HiObject* x, HiObject* y);
 };
 

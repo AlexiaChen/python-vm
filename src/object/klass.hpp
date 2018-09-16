@@ -27,6 +27,8 @@ public:
     void set_klass_dict(HiDict* dict)     { _klass_dict = dict; }
     HiDict* klass_dict()                  { return _klass_dict; }
 
+    static int compare_klass(Klass* x, Klass* y);
+
     virtual void print(HiObject* obj) {};
 
     virtual HiObject* greater  (HiObject* x, HiObject* y) { return 0; }

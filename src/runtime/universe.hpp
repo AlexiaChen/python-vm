@@ -8,8 +8,8 @@ class HiObject;
 
 class Universe {
 public:
-    static HiInteger* HiTrue;
-    static HiInteger* HiFalse;
+    static HiObject* HiTrue;
+    static HiObject* HiFalse;
 
     static HiObject* HiNone;
 

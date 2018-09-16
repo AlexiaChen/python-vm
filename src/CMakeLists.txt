@@ -10,6 +10,7 @@ ADD_EXECUTABLE(railgun main.cpp
     object/hiString.cpp
     object/hiObject.cpp
     object/hiList.cpp
+    object/klass.cpp
     util/arrayList.cpp
     util/map.cpp
     runtime/interpreter.cpp

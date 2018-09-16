@@ -1,4 +1,5 @@
 #include "object/klass.hpp"
+#include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
 #include "runtime/universe.hpp"
 
@@ -7,6 +8,7 @@
 IntegerKlass* IntegerKlass::instance = NULL;
 
 IntegerKlass::IntegerKlass() {
+    set_name(new HiString("int"));
 }
 
 HiInteger::HiInteger(int x) {
@@ -45,9 +47,16 @@ HiObject* IntegerKlass::greater(HiObject* x, HiObject* y) {
 
 HiObject* IntegerKlass::less(HiObject* x, HiObject* y) {
     HiInteger* ix = (HiInteger*) x;
-    HiInteger* iy = (HiInteger*) y;
-
     assert(ix && (ix->klass() == (Klass *)this));
+
+    if (x->klass() != y->klass()) {
+        if (Klass::compare_klass(x->klass(), y->klass()) < 0)
+            return Universe::HiTrue;
+        else
+            return Universe::HiFalse;
+    }
+
+    HiInteger* iy = (HiInteger*)y;
     assert(iy && (iy->klass() == (Klass *)this));
 
     if (ix->value() < iy->value())
