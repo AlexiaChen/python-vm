@@ -2,6 +2,7 @@
 #include "runtime/frameObject.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "runtime/stringTable.hpp"
 #include "util/arrayList.hpp"
 #include "util/map.hpp"
 #include "object/hiString.hpp"
@@ -332,7 +333,7 @@ void Interpreter::run(CodeObject* codes) {
 
             case ByteCode::FOR_ITER:
                 v = TOP();
-                w = v->getattr(new HiString("next"));
+                w = v->getattr(StringTable::get_instance()->next_str);
                 build_frame(w, NULL);
 
                 if (TOP() == NULL) {
