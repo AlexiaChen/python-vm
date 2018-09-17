@@ -2,6 +2,7 @@
 #include "object/hiString.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "object/hiDict.hpp"
 
 FunctionKlass* FunctionKlass::instance = NULL;
 

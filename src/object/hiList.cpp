@@ -1,6 +1,7 @@
 #include "object/hiList.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
+#include "object/hiDict.hpp"
 #include "runtime/stringTable.hpp"
 #include "runtime/interpreter.hpp"
 #include "runtime/universe.hpp"

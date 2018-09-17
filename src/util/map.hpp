@@ -34,7 +34,4 @@ public:
     MapEntry<K, V>* entries() { return _entries; }
 };
 
-class HiObject;
-typedef Map<HiObject*, HiObject*> HiDict;
-
 #endif

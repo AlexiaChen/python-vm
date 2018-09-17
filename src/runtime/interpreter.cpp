@@ -8,6 +8,7 @@
 #include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiList.hpp"
+#include "object/hiDict.hpp"
 
 #include <string.h>
 
@@ -30,7 +31,7 @@ Interpreter* Interpreter::get_instance() {
 }
 
 Interpreter::Interpreter() {
-    _builtins = new Map<HiObject*, HiObject*>();
+    _builtins = new HiDict();
 
     _builtins->put(new HiString("True"),     Universe::HiTrue);
     _builtins->put(new HiString("False"),    Universe::HiFalse);
@@ -186,6 +187,13 @@ void Interpreter::run(CodeObject* codes) {
                 v = POP();
                 w = POP();
                 v->store_subscr(u, w);
+                break;
+
+            case ByteCode::STORE_MAP:
+                w = POP();
+                u = POP();
+                v = TOP();
+                ((HiDict*)v)->put(w, u);
                 break;
 
             case ByteCode::BINARY_SUBSCR:
@@ -356,6 +364,11 @@ void Interpreter::run(CodeObject* codes) {
                 while (op_arg--) {
                     ((HiList*)v)->set(op_arg, POP());
                 }
+                PUSH(v);
+                break;
+
+            case ByteCode::BUILD_MAP:
+                v = new HiDict();
                 PUSH(v);
                 break;
 

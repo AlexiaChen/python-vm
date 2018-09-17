@@ -2,13 +2,14 @@
 #include "runtime/functionObject.hpp"
 #include "object/hiString.hpp"
 #include "object/hiList.hpp"
+#include "object/hiDict.hpp"
 
 // this constructor is used for module only.
 FrameObject::FrameObject(CodeObject* codes) {
     _consts  = codes->_consts;
     _names   = codes->_names;
     
-    _locals  = new Map<HiObject*, HiObject*>();
+    _locals  = new HiDict();
     _globals = _locals;
     _fast_locals = NULL;
 
@@ -25,7 +26,7 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args) {
     _consts  = _codes->_consts;
     _names   = _codes->_names;
 
-    _locals  = new Map<HiObject*, HiObject*>();
+    _locals  = new HiDict();
     _globals = func->_globals;
     _fast_locals = new ArrayList<HiObject*>();
 

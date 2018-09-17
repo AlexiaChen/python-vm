@@ -4,6 +4,8 @@
 #include "code/codeObject.hpp"
 #include "object/klass.hpp"
 
+class HiDict;
+
 class FunctionKlass : public Klass {
 private:
     FunctionKlass();
@@ -27,7 +29,7 @@ friend class FrameObject;
 private:
     CodeObject* _func_code;
     HiString*   _func_name;
-    Map<HiObject*, HiObject*>* _globals;
+    HiDict*     _globals;
     ObjList     _defaults;
 
     NativeFuncPointer _native_func;
@@ -52,8 +54,8 @@ public:
     HiString*  func_name()   { return _func_name; }
     int  flags()             { return _flags; }
 
-    Map<HiObject*, HiObject*>* globals() { return _globals; }
-    void set_globals(Map<HiObject*, HiObject*>* x) { _globals = x; }
+    HiDict* globals()        { return _globals; }
+    void set_globals(HiDict* x) { _globals = x; }
 
     void set_default(ObjList defaults);
     ObjList defaults()       { return _defaults; }

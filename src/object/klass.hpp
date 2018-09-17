@@ -2,11 +2,11 @@
 #define _KLASS_HPP
 
 #include <stdio.h>
-#include "util/map.hpp"
 #include "util/arrayList.hpp"
 
 class HiObject;
 class HiString;
+class HiDict;
 class OopClosure;
 
 class Klass {

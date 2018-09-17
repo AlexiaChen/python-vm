@@ -1,4 +1,5 @@
 #include "object/hiObject.hpp"
+#include "object/hiDict.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
 

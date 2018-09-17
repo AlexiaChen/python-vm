@@ -5,11 +5,12 @@
 #include "code/codeObject.hpp"
 
 class FrameObject;
+class HiDict;
 
 class Interpreter {
 private:
-    Map<HiObject*, HiObject*>*    _builtins;
-    FrameObject*                  _frame;
+    HiDict*               _builtins;
+    FrameObject*          _frame;
 
     static Interpreter*   _instance;
     Interpreter();

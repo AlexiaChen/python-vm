@@ -1,8 +1,9 @@
 #include "runtime/universe.hpp"
+#include "runtime/functionObject.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiObject.hpp"
 #include "object/hiString.hpp"
-#include "runtime/functionObject.hpp"
+#include "object/hiDict.hpp"
 
 HiObject* Universe::HiTrue   = NULL;
 HiObject* Universe::HiFalse  = NULL;
