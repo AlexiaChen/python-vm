@@ -1,4 +1,5 @@
 #include "object/hiDict.hpp"
+#include "object/hiList.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
 #include "runtime/functionObject.hpp"
@@ -24,6 +25,12 @@ void DictKlass::initialize() {
             new FunctionObject(dict_set_default));
     klass_dict->put(new HiString("remove"),
             new FunctionObject(dict_remove));
+    klass_dict->put(new HiString("keys"),
+            new FunctionObject(dict_keys));
+    klass_dict->put(new HiString("values"),
+            new FunctionObject(dict_values));
+    klass_dict->put(new HiString("items"),
+            new FunctionObject(dict_items));
     set_klass_dict(klass_dict);
 }
 
@@ -69,8 +76,7 @@ void DictKlass::store_subscr(HiObject* x, HiObject*y, HiObject* z) {
 }
 
 HiObject* DictKlass::iter(HiObject* x) {
-    HiObject* obj = new HiObject();
-    return obj;
+    return new DictIterator((HiDict*)x);
 }
 
 void DictKlass::del_subscr(HiObject* x, HiObject* y) {
@@ -101,20 +107,17 @@ DictIteratorKlass* DictIteratorKlass::get_instance() {
     return instance;
 }
 
-DictIteratorKlass::DictIteratorKlass() {
+DictIterator::DictIterator(HiDict* dict) {
+    _owner = dict;
+    _iter_cnt = 0;
+    set_klass(DictIteratorKlass::get_instance());
 }
 
-HiObject* DictIteratorKlass::next(HiObject* x) {
-    HiString* attr_name = new HiString("iter_cnt");
-    HiInteger* iter_cnt = (HiInteger*)(x->getattr(attr_name));
-
-    HiDict* adict = (HiDict*)(x->getattr(new HiString("dobj")));
-    if (iter_cnt->value() < adict->map()->size()) {
-        HiObject* obj = adict->map()->get_key(iter_cnt->value());
-        return obj;
-    }
-    else // TODO : we need Traceback here to mark iteration end
-        return NULL;
+DictIteratorKlass::DictIteratorKlass() {
+    HiDict* klass_dict = new HiDict();
+    klass_dict->put(new HiString("next"), 
+            new FunctionObject(dictiterator_next));
+    set_klass_dict(klass_dict);
 }
 
 HiObject* dict_set_default(ObjList args) {
@@ -135,5 +138,58 @@ HiObject* dict_remove(ObjList args) {
     ((HiDict*)x)->remove(y);
 
     return Universe::HiNone;
+}
+
+HiObject* dict_keys(ObjList args) {
+    HiDict* x = (HiDict*)(args->get(0));
+
+    HiList* keys = new HiList();
+
+    for (int i = 0; i < x->size(); i++) {
+        keys->append(x->map()->get_key(i));
+    }
+
+    return keys;
+}
+
+HiObject* dict_values(ObjList args) {
+    HiDict* x = (HiDict*)(args->get(0));
+
+    HiList* values = new HiList();
+
+    for (int i = 0; i < x->size(); i++) {
+        values->append(x->map()->get_value(i));
+    }
+
+    return values;
+}
+
+HiObject* dict_items(ObjList args) {
+    HiDict* x = (HiDict*)(args->get(0));
+
+    HiList* items = new HiList();
+
+    for (int i = 0; i < x->size(); i++) {
+        HiList* item = new HiList();
+        item->append(x->map()->get_key(i));
+        item->append(x->map()->get_value(i));
+        items->append(item);
+    }
+
+    return items;
+}
+
+HiObject* dictiterator_next(ObjList args) {
+    DictIterator* iter = (DictIterator*)(args->get(0));
+
+    HiDict* adict = iter->owner();
+    int iter_cnt = iter->iter_cnt();
+    if (iter_cnt < adict->map()->size()) {
+        HiObject* obj = adict->map()->get_key(iter_cnt);
+        iter->inc_cnt();
+        return obj;
+    }
+    else // TODO : we need Traceback here to mark iteration end
+        return NULL;
 }
 

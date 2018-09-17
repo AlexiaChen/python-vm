@@ -78,9 +78,15 @@ V Map<K, V>::remove(K k) {
     _entries[i] = _entries[--_size];
     return v;
 }
+
 template <typename K, typename V>
 K Map<K, V>::get_key(int index) {
     return _entries[index]._k;
+}
+
+template <typename K, typename V>
+V Map<K, V>::get_value(int index) {
+    return _entries[index]._v;
 }
 
 template class Map<HiObject*, HiObject*>;

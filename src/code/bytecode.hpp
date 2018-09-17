@@ -40,6 +40,7 @@ public:
     static const unsigned char HAVE_ARGUMENT = 90; /* Opcodes from here have an argument: */
 
     static const unsigned char STORE_NAME = 90; /* Index in name list */
+    static const unsigned char UNPACK_SEQUENCE = 92;
     static const unsigned char FOR_ITER = 93;
     static const unsigned char STORE_ATTR = 95;  /* Index in name list */
     static const unsigned char STORE_GLOBAL = 97;
