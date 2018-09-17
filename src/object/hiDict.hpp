@@ -45,7 +45,10 @@ public:
     Map<HiObject*, HiObject*>* map()   { return _map; }
     void put(HiObject* k, HiObject* v) { _map->put(k, v); }
     HiObject* get(HiObject* k)         { return _map->get(k); }
+    bool has_key(HiObject* k)          { return _map->has_key(k); }
     HiObject* remove(HiObject* k)      { return _map->remove(k); }
 };
+
+HiObject* dict_set_default(ObjList args);
 
 #endif
