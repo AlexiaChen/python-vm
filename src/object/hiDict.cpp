@@ -22,6 +22,8 @@ void DictKlass::initialize() {
     HiDict* klass_dict = new HiDict();
     klass_dict->put(new HiString("setdefault"),
             new FunctionObject(dict_set_default));
+    klass_dict->put(new HiString("remove"),
+            new FunctionObject(dict_remove));
     set_klass_dict(klass_dict);
 }
 
@@ -122,6 +124,15 @@ HiObject* dict_set_default(ObjList args) {
 
     if (!dict->has_key(key))
         dict->put(key, value);
+
+    return Universe::HiNone;
+}
+
+HiObject* dict_remove(ObjList args) {
+    HiObject* x = args->get(0);
+    HiObject* y = args->get(1);
+
+    ((HiDict*)x)->remove(y);
 
     return Universe::HiNone;
 }

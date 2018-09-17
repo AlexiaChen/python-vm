@@ -51,5 +51,6 @@ public:
 };
 
 HiObject* dict_set_default(ObjList args);
+HiObject* dict_remove(ObjList args);
 
 #endif
