@@ -1,6 +1,8 @@
 #include "object/hiList.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
+#include "runtime/stringTable.hpp"
+#include "runtime/interpreter.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
 #include <assert.h>
@@ -26,9 +28,47 @@ ListKlass::ListKlass() {
         new FunctionObject(list_reverse));
     klass_dict->put(new HiString("sort"), 
         new FunctionObject(list_sort));
+    klass_dict->put(new HiString("extend"), 
+        new FunctionObject(list_extend));
     set_klass_dict(klass_dict);
 
     set_name(new HiString("list"));
+}
+
+HiObject* ListKlass::add(HiObject* x, HiObject* y) {
+    HiList* lx = (HiList*)x;
+    assert(lx && lx->klass() == (Klass*) this);
+    HiList* ly = (HiList*)y;
+    assert(ly && ly->klass() == (Klass*) this);
+
+    HiList* z = new HiList();
+    for (int i = 0; i < lx->size(); i++) {
+        z->inner_list()->set(i, lx->inner_list()->get(i));
+    }
+
+    for (int i = 0; i < ly->size(); i++) {
+        z->inner_list()->set(i + lx->size(),
+                ly->inner_list()->get(i));
+    }
+
+    return z;
+}
+
+HiObject* ListKlass::mul(HiObject* x, HiObject* y) {
+    HiList * lx = (HiList*)x;
+    assert(lx && lx->klass() == (Klass*) this);
+    HiInteger* iy = (HiInteger*)y;
+    assert(iy && iy->klass() == IntegerKlass::get_instance());
+
+    HiList* z = new HiList();
+    for (int i = 0; i < iy->value(); i++) {
+        for (int j = 0; j < lx->size(); j++) {
+            z->inner_list()->set(i * lx->size() + j,
+                    lx->inner_list()->get(j));
+        }
+    }
+
+    return z;
 }
 
 void ListKlass::print(HiObject* x) {
@@ -156,6 +196,21 @@ HiObject* list_sort(ObjList args) {
                 list->set(j-1, t);
             }
         }
+    }
+
+    return Universe::HiNone;
+}
+
+HiObject* list_extend(ObjList args) {
+    HiList* lx = (HiList*)(args->get(0));
+    HiObject* obj = args->get(1);
+
+    HiObject* next_func = obj->iter()->getattr(StringTable::get_instance()->next_str);
+    assert(next_func != Universe::HiNone);
+
+    HiObject* to;
+    while ((to = Interpreter::get_instance()->call_virtual(next_func, NULL)) != NULL) {
+        lx->append(to);
     }
 
     return Universe::HiNone;

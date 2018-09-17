@@ -19,6 +19,16 @@
 #define HI_TRUE       Universe::HiTrue
 #define HI_FALSE      Universe::HiFalse
 
+Interpreter* Interpreter::_instance = NULL;
+
+Interpreter* Interpreter::get_instance() {
+    if (_instance == NULL) {
+        _instance = new Interpreter();
+    }
+
+    return _instance;
+}
+
 Interpreter::Interpreter() {
     _builtins = new Map<HiObject*, HiObject*>();
 
@@ -62,6 +72,23 @@ void Interpreter::leave_frame(HiObject* return_value) {
     PUSH(return_value);
 
     delete temp;
+}
+
+HiObject* Interpreter::call_virtual(HiObject* func, ObjList args) {
+    if (func->klass() == NativeFunctionKlass::get_instance()) {
+        // we do not create a virtual frame, but native frame.
+        return ((FunctionObject*)func)->call(args);
+    }
+    else if (MethodObject::is_method(func)) {
+        MethodObject* method = (MethodObject*) func;
+        if (!args) {
+            args = new ArrayList<HiObject*>(1);
+        }
+        args->insert(0, method->owner());
+        return call_virtual(method->func(), args);
+    }
+
+    return Universe::HiNone;
 }
 
 void Interpreter::run(CodeObject* codes) {
@@ -180,6 +207,12 @@ void Interpreter::run(CodeObject* codes) {
                 v = POP();
                 w = POP();
                 PUSH(w->add(v));
+                break;
+
+            case ByteCode::BINARY_MULTIPLY:
+                v = POP();
+                w = POP();
+                PUSH(w->mul(v));
                 break;
 
             case ByteCode::MAKE_FUNCTION:

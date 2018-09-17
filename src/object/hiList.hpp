@@ -15,6 +15,9 @@ private:
 public:
     static ListKlass* get_instance();
 
+    virtual HiObject* add(HiObject* x, HiObject* y);
+    virtual HiObject* mul(HiObject* x, HiObject* y);
+
     virtual void print(HiObject* obj);
     virtual HiObject* subscr (HiObject* x, HiObject* y);
     virtual void store_subscr (HiObject* x, HiObject* y, HiObject* z);
@@ -48,6 +51,7 @@ HiObject* list_pop(ObjList args);
 HiObject* list_remove(ObjList args);
 HiObject* list_reverse(ObjList args);
 HiObject* list_sort(ObjList args);
+HiObject* list_extend(ObjList args);
 
 class ListIteratorKlass : public Klass {
 private:

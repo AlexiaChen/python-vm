@@ -14,8 +14,7 @@ int main(int argc, char** argv) {
     CodeObject* main_code = parser.parse();
     Universe::genesis();
 
-    Interpreter interpreter;
-    interpreter.run(main_code);
+    Interpreter::get_instance()->run(main_code);
 
     return 0;
 }
