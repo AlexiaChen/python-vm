@@ -75,7 +75,7 @@ V Map<K, V>::remove(K k) {
         return 0; 
 
     V v = _entries[i]._v;
-    _entries[i] = _entries[_size--];
+    _entries[i] = _entries[--_size];
     return v;
 }
 template <typename K, typename V>

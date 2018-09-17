@@ -71,6 +71,11 @@ HiObject* DictKlass::iter(HiObject* x) {
     return obj;
 }
 
+void DictKlass::del_subscr(HiObject* x, HiObject* y) {
+    assert(x && x->klass() == (Klass*) this);
+    ((HiDict*)x)->remove(y);
+}
+
 HiDict::HiDict() {
     _map = new Map<HiObject*, HiObject*>();
     set_klass(DictKlass::get_instance());
