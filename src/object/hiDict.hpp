@@ -45,7 +45,17 @@ HiObject* dict_remove(ObjList args);
 HiObject* dict_keys(ObjList args);
 HiObject* dict_values(ObjList args);
 HiObject* dict_items(ObjList args);
+HiObject* dict_iterkeys(ObjList args);
+HiObject* dict_itervalues(ObjList args);
+HiObject* dict_iteritems(ObjList args);
 
+enum ITER_TYPE {
+    ITER_KEY = 0,
+    ITER_VALUE,
+    ITER_ITEM
+};
+
+template<ITER_TYPE n>
 class DictIteratorKlass : public Klass {
 private:
     static DictIteratorKlass* instance;
@@ -53,6 +63,7 @@ private:
 
 public:
     static DictIteratorKlass* get_instance();
+    virtual HiObject* iter(HiObject* x)  { return x; }
 };
 
 class DictIterator : public HiObject {
@@ -67,7 +78,8 @@ public:
     void inc_cnt()         { _iter_cnt++; }
 };
 
-HiObject* dictiterator_next(ObjList args);
+template<ITER_TYPE iter_type>
+HiObject* dict_iterator_next(ObjList args);
 
 #endif
 

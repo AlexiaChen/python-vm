@@ -18,3 +18,9 @@ int Klass::compare_klass(Klass* x, Klass* y) {
         return 1;
 }
 
+void Klass::print(HiObject* x) {
+    printf("<object of ");
+    x->klass()->name()->print();
+    printf(", at %p>", x);
+}
+
