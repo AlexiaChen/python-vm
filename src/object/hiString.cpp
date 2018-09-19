@@ -25,6 +25,7 @@ void StringKlass::initialize() {
     set_klass_dict(klass_dict);
 
     set_name(new HiString("str"));
+    set_super(ObjectKlass::get_instance());
 }
 
 HiObject* StringKlass::equal(HiObject* x, HiObject* y) {

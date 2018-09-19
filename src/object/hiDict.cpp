@@ -39,6 +39,7 @@ void DictKlass::initialize() {
     klass_dict->put(new HiString("iteritems"),
             new FunctionObject(dict_iteritems));
     set_klass_dict(klass_dict);
+    set_super(ObjectKlass::get_instance());
 }
 
 void DictKlass::print(HiObject* obj) {
