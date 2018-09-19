@@ -12,5 +12,6 @@ StringTable* StringTable::get_instance() {
 
 StringTable::StringTable() {
     next_str = new HiString("next");
+    mod_str = new HiString("__module__");
 }
 

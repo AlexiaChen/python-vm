@@ -10,6 +10,7 @@ private:
 
 public:
     static StringKlass* get_instance();
+    void initialize();
 
     virtual HiObject* equal    (HiObject* x, HiObject* y);
 

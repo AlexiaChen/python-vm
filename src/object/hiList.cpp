@@ -33,6 +33,7 @@ ListKlass::ListKlass() {
         new FunctionObject(list_extend));
     set_klass_dict(klass_dict);
 
+    (new HiTypeObject())->set_own_klass(this);
     set_name(new HiString("list"));
 }
 

@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "util/arrayList.hpp"
 
+class HiTypeObject;
 class HiObject;
 class HiString;
 class HiDict;
@@ -13,6 +14,7 @@ class OopClosure;
 class Klass {
 private:
     Klass*        _super;
+    HiTypeObject* _type_object;
     HiString*     _name;
     HiDict*       _klass_dict;
 
@@ -21,6 +23,9 @@ public:
 
     void set_super(Klass* x)              { _super = x; }
     Klass* super()                        { return _super; }
+
+    void set_type_object(HiTypeObject* x) { _type_object = x; }
+    HiTypeObject* type_object()           { return _type_object; }
 
     void set_name(HiString* x)            { _name = x; }
     HiString* name()                      { assert(_name); return _name; }

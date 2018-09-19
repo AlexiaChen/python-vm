@@ -3,8 +3,12 @@
 
 #include <stdio.h>
 
+class Klass;
 class HiInteger;
 class HiObject;
+
+template <typename T>
+class ArrayList;
 
 class Universe {
 public:
@@ -12,6 +16,7 @@ public:
     static HiObject* HiFalse;
 
     static HiObject* HiNone;
+    static ArrayList<Klass*>* klasses;
 
 public:
     static void genesis();

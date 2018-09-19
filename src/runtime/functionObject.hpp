@@ -17,7 +17,6 @@ public:
     virtual void print(HiObject* obj);
 };
 
-HiObject* len(ObjList args);
 HiObject* string_upper(ObjList args);
 
 typedef HiObject* (*NativeFuncPointer)(ObjList args);
@@ -106,5 +105,9 @@ private:
 public:
     static NativeFunctionKlass* get_instance();
 };
+
+HiObject* len(ObjList args);
+HiObject* type_of(ObjList args);
+HiObject* isinstance(ObjList args);
 
 #endif

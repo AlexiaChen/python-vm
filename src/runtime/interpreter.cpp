@@ -38,6 +38,14 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("None"),     Universe::HiNone);
 
     _builtins->put(new HiString("len"),      new FunctionObject(len));
+    _builtins->put(new HiString("type"),     new FunctionObject(type_of));
+    _builtins->put(new HiString("isinstance"),new FunctionObject(isinstance));
+
+    _builtins->put(new HiString("int"),      IntegerKlass::get_instance()->type_object());
+    _builtins->put(new HiString("object"),   ObjectKlass::get_instance()->type_object());
+    _builtins->put(new HiString("str"),      StringKlass::get_instance()->type_object());
+    _builtins->put(new HiString("list"),     ListKlass::get_instance()->type_object());
+
 }
 
 void Interpreter::build_frame(HiObject* callable, ObjList args) {

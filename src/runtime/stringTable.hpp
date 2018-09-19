@@ -13,6 +13,7 @@ public:
     static StringTable* get_instance();
     
     HiString* next_str;
+    HiString* mod_str;
 };
 
 #endif
