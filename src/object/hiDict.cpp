@@ -39,6 +39,7 @@ void DictKlass::initialize() {
     klass_dict->put(new HiString("iteritems"),
             new FunctionObject(dict_iteritems));
     set_klass_dict(klass_dict);
+    (new HiTypeObject())->set_own_klass(this);
     set_super(ObjectKlass::get_instance());
 }
 
@@ -62,10 +63,6 @@ void DictKlass::print(HiObject* obj) {
     }
 
     printf("}");
-}
-
-size_t DictKlass::size() {
-    return sizeof(HiDict);
 }
 
 HiObject* DictKlass::getattr(HiObject* obj, HiString* name) {
@@ -241,6 +238,13 @@ HiObject* dict_iterator_next(ObjList args) {
         return obj;
     }
     else // TODO : we need Traceback here to mark iteration end
+        return NULL;
+}
+
+HiObject* DictKlass::allocate_instance(ArrayList<HiObject*>* args) {
+    if (!args || args->length() == 0)
+        return new HiDict();
+    else
         return NULL;
 }
 

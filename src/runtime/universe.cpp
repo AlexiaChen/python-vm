@@ -12,8 +12,8 @@ HiObject*  Universe::HiNone   = NULL;
 ArrayList<Klass*>* Universe::klasses   = NULL;
 
 void Universe::genesis() {
-    HiTrue       = new HiInteger(1);
-    HiFalse      = new HiInteger(0);
+    HiTrue       = new HiString("True");
+    HiFalse      = new HiString("False");
 
     HiNone       = new HiObject();
 

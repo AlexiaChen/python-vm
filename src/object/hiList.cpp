@@ -296,3 +296,10 @@ HiObject* listiterator_next(ObjList args) {
         return NULL;
 }
 
+HiObject* ListKlass::allocate_instance(ArrayList<HiObject*>* args) {
+    if (!args || args->length() == 0)
+        return new HiList();
+    else
+        return NULL;
+}
+

@@ -35,6 +35,12 @@ void IntegerKlass::print(HiObject* obj) {
     printf("%d", int_obj->value());
 }
 
+HiObject* IntegerKlass::allocate_instance(ArrayList<HiObject*>* args) {
+    if (!args || args->length() == 0)
+        return new HiInteger(0);
+    else
+        return NULL;
+}
 
 HiObject* IntegerKlass::greater(HiObject* x, HiObject* y) {
     HiInteger* ix = (HiInteger*) x;
