@@ -54,12 +54,16 @@ public:
     CodeObject*           _codes;
     FrameObject*          _sender;
     int                   _pc;
+    bool                  _entry_frame;
 
 public:
     void set_sender(FrameObject* x) { _sender = x; }
     FrameObject* sender()           { return _sender;}
     void set_pc(int x)              { _pc = x; }
     int  get_pc()                   { return _pc; }
+    void set_entry_frame(bool x)    { _entry_frame = x; }
+    bool is_entry_frame()           { return _entry_frame; }
+    bool is_first_frame()           { return _sender == NULL; }
 
     HiList* stack()                 { return _stack; }
     ArrayList<Block*>* loop_stack() { return _loop_stack; }

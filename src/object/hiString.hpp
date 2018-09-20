@@ -18,7 +18,8 @@ public:
     virtual HiObject* less   (HiObject* x, HiObject* y);
     virtual HiObject* subscr (HiObject* x, HiObject* y);
 
-    virtual HiObject* allocate_instance(ArrayList<HiObject*>* args);
+    virtual HiObject* allocate_instance(HiObject* callable, 
+            ArrayList<HiObject*>* args);
 };
 
 class HiString : public HiObject {

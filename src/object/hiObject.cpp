@@ -69,6 +69,12 @@ HiObject* HiObject::le(HiObject * rhs) {
 HiObject* HiObject::getattr(HiObject* x) {
     HiObject* result = Universe::HiNone;
 
+    if (_obj_dict != NULL) {
+        result = _obj_dict->get(x);
+        if (result != Universe::HiNone)
+            return result;
+    }
+
     result = klass()->klass_dict()->get(x);
 
     if (result == Universe::HiNone)
@@ -79,6 +85,14 @@ HiObject* HiObject::getattr(HiObject* x) {
         result = new MethodObject((FunctionObject*)result, this);
     }
     return result;
+}
+
+HiObject* HiObject::setattr(HiObject* x, HiObject* y) {
+    if (!_obj_dict)
+        _obj_dict = new HiDict();
+
+    _obj_dict->put(x, y);
+    return Universe::HiNone;
 }
 
 HiObject* HiObject::subscr(HiObject* x) {

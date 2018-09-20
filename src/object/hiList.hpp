@@ -26,7 +26,8 @@ public:
     virtual HiObject* less     (HiObject* x, HiObject* y);
     virtual HiObject* iter(HiObject* x);
 
-    virtual HiObject* allocate_instance(ArrayList<HiObject*>* args);
+    virtual HiObject* allocate_instance(HiObject* callable, 
+            ArrayList<HiObject*>* args);
 };
 
 class HiList : public HiObject {

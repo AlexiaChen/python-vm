@@ -35,7 +35,8 @@ void IntegerKlass::print(HiObject* obj) {
     printf("%d", int_obj->value());
 }
 
-HiObject* IntegerKlass::allocate_instance(ArrayList<HiObject*>* args) {
+HiObject* IntegerKlass::allocate_instance(HiObject* callable, 
+        ArrayList<HiObject*>* args) {
     if (!args || args->length() == 0)
         return new HiInteger(0);
     else

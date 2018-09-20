@@ -69,21 +69,19 @@ void Interpreter::build_frame(HiObject* callable, ObjList args) {
     }
     else if (callable->klass() == TypeKlass::get_instance()) {
         HiObject* inst = ((HiTypeObject*)callable)->own_klass()->
-            allocate_instance(args); 
+            allocate_instance(callable, args); 
         PUSH(inst);
     }
 }
 
-void Interpreter::leave_frame(HiObject* return_value) {
-    if (!_frame->sender()) {
-        delete _frame;
-        _frame = NULL;
-        return;
-    }
+void Interpreter::leave_frame() {
+    destroy_frame();
+    PUSH(_ret_value);
+}
 
+void Interpreter::destroy_frame() {
     FrameObject* temp = _frame;
-    _frame         = _frame->sender();
-    PUSH(return_value);
+    _frame = _frame->sender();
 
     delete temp;
 }
@@ -101,13 +99,30 @@ HiObject* Interpreter::call_virtual(HiObject* func, ObjList args) {
         args->insert(0, method->owner());
         return call_virtual(method->func(), args);
     }
+    else if (MethodObject::is_function(func)) {
+        FrameObject* frame = new FrameObject((FunctionObject*) func, args);
+        frame->set_entry_frame(true);
+        enter_frame(frame);
+        eval_frame();
+        destroy_frame();
+        return _ret_value;
+    }
 
     return Universe::HiNone;
 }
 
+void Interpreter::enter_frame(FrameObject* frame) {
+    frame->set_sender(_frame);
+    _frame         = frame;
+}
+
 void Interpreter::run(CodeObject* codes) {
     _frame = new FrameObject(codes);
+    eval_frame();
+    destroy_frame();
+}
 
+void Interpreter::eval_frame() {
     Block* b;
     FunctionObject* fo;
     ArrayList<HiObject*>* args = NULL;
@@ -181,6 +196,10 @@ void Interpreter::run(CodeObject* codes) {
                 PUSH(v->getattr(w));
                 break;
 
+            case ByteCode::LOAD_LOCALS:
+                PUSH(_frame->_locals);
+                break;
+
             case ByteCode::STORE_NAME:
                 v = _frame->names()->get(op_arg);
                 _frame->locals()->put(v, POP());
@@ -209,6 +228,13 @@ void Interpreter::run(CodeObject* codes) {
                 ((HiDict*)v)->put(w, u);
                 break;
 
+            case ByteCode::STORE_ATTR:
+                u = POP();
+                v = _frame->_names->get(op_arg);
+                w = POP();
+                u->setattr(v, w);
+                break;
+
             case ByteCode::BINARY_SUBSCR:
                 v = POP();
                 w = POP();
@@ -228,6 +254,12 @@ void Interpreter::run(CodeObject* codes) {
                 v = POP();
                 w = POP();
                 PUSH(w->add(v));
+                break;
+
+            case ByteCode::BINARY_SUBTRACT:
+                v = POP();
+                w = POP();
+                PUSH(w->sub(v));
                 break;
 
             case ByteCode::BINARY_MULTIPLY:
@@ -273,9 +305,11 @@ void Interpreter::run(CodeObject* codes) {
                 break;
 
             case ByteCode::RETURN_VALUE:
-                leave_frame(POP());
-                if (!_frame)
+                _ret_value = POP();
+                if (_frame->is_first_frame() ||
+                        _frame->is_entry_frame())
                     return;
+                leave_frame();
                 break;
 
             case ByteCode::COMPARE_OP:
@@ -372,6 +406,7 @@ void Interpreter::run(CodeObject* codes) {
                 _frame->set_pc(b->_target);
                 break;
 
+            case ByteCode::BUILD_TUPLE: // drop down, we need this
             case ByteCode::BUILD_LIST:
                 v = new HiList();
                 while (op_arg--) {
@@ -382,6 +417,14 @@ void Interpreter::run(CodeObject* codes) {
 
             case ByteCode::BUILD_MAP:
                 v = new HiDict();
+                PUSH(v);
+                break;
+
+            case ByteCode::BUILD_CLASS:
+                v = POP();
+                u = POP();
+                w = POP();
+                v = Klass::create_klass(v, u, w);
                 PUSH(v);
                 break;
 

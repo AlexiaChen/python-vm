@@ -119,7 +119,8 @@ HiObject* StringKlass::less(HiObject* x, HiObject* y) {
     return Universe::HiFalse;
 }
 
-HiObject* StringKlass::allocate_instance(ArrayList<HiObject*>* args) {
+HiObject* StringKlass::allocate_instance(HiObject* callable, 
+        ArrayList<HiObject*>* args) {
     if (!args || args->length() == 0)
         return new HiString("");
     else

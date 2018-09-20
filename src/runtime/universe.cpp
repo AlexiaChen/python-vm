@@ -14,8 +14,7 @@ ArrayList<Klass*>* Universe::klasses   = NULL;
 void Universe::genesis() {
     HiTrue       = new HiString("True");
     HiFalse      = new HiString("False");
-
-    HiNone       = new HiObject();
+    HiNone       = new HiString("None");
 
     klasses = new ArrayList<Klass*>();
 

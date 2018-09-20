@@ -18,6 +18,7 @@ public:
 class HiObject {
 private:
     Klass*  _klass;
+    HiDict* _obj_dict;
 
 public:
     Klass* klass()             { assert(_klass != NULL); return _klass; }
@@ -39,6 +40,7 @@ public:
     HiObject* le       (HiObject* x);
 
     HiObject* getattr(HiObject* x);
+    HiObject* setattr(HiObject* x, HiObject* y);
 
     HiObject* subscr(HiObject* x);
     void      store_subscr(HiObject* x, HiObject* y); 

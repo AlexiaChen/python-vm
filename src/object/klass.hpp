@@ -21,6 +21,8 @@ private:
 public:
     Klass() {};
 
+    static HiObject* create_klass(HiObject* x, HiObject* supers, HiObject* name);
+
     void set_super(Klass* x)              { _super = x; }
     Klass* super()                        { return _super; }
 
@@ -56,7 +58,7 @@ public:
     virtual HiObject* contains (HiObject* x, HiObject* y) { return 0; }
 
     virtual HiObject* call(ArrayList<HiObject*>* args) { return 0; }
-    virtual HiObject* allocate_instance(ArrayList<HiObject*>* args) { return 0; }
+    virtual HiObject* allocate_instance(HiObject* type_object, ArrayList<HiObject*>* args);
 
     virtual HiObject* iter(HiObject* x) { return 0; }
 };
