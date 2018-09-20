@@ -21,23 +21,23 @@ void Universe::genesis() {
 
     Klass* object_klass = ObjectKlass::get_instance();
     Klass* type_klass   = TypeKlass::get_instance();
-    Klass* int_klass    = IntegerKlass::get_instance();
 
     HiTypeObject* tp_obj = new HiTypeObject();
-    type_klass->set_name(new HiString("type"));
     tp_obj->set_own_klass(type_klass);
     type_klass->set_super(object_klass);
 
-    int_klass->set_name(new HiString("int"));
-    int_klass->set_super(object_klass);
-    
-    object_klass->set_name(new HiString("object"));
     HiTypeObject* obj_obj = new HiTypeObject();
     obj_obj->set_own_klass(object_klass);
     object_klass->set_super(NULL);
 
     DictKlass::get_instance()->initialize();
     StringKlass::get_instance()->initialize();
+
+    type_klass->set_klass_dict(new HiDict());
+    object_klass->set_klass_dict(new HiDict());
+
+    type_klass->set_name(new HiString("type"));
+    object_klass->set_name(new HiString("object"));
 }
 
 void Universe::destroy() {
