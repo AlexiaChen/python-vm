@@ -22,6 +22,10 @@ void HiObject::print() {
     klass()->print(this);
 }
 
+HiObject::HiObject() {
+    _obj_dict = NULL;
+}
+
 HiObject* HiObject::greater(HiObject * rhs) {
     return klass()->greater(this, rhs);
 }

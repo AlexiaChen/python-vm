@@ -8,6 +8,9 @@
 #include "object/hiList.hpp"
 #include "object/hiString.hpp"
 
+#define ST(x) StringTable::get_instance()->STR(x)
+#define STR(x) x##_str
+
 int Klass::compare_klass(Klass* x, Klass* y) {
     if (x == y)
         return 0;
@@ -59,5 +62,27 @@ HiObject* Klass::allocate_instance(HiObject* callable, ArrayList<HiObject*>* arg
     }
 
     return inst;
+}
+
+HiObject* Klass::add(HiObject* lhs, HiObject* rhs) {
+    ObjList args = new ArrayList<HiObject*>();
+    args->add(rhs);
+    return find_and_call(lhs, args, ST(add));
+}
+
+HiObject* Klass::find_and_call(HiObject* lhs, ObjList args, HiObject* func_name) {
+    HiObject* func = lhs->getattr(func_name);
+    if (func != Universe::HiNone) {
+        if (!args)
+            args = new ArrayList<HiObject*>();
+
+        return Interpreter::get_instance()->call_virtual(func, args);
+    }
+
+    printf("class ");
+    lhs->klass()->name()->print();
+    printf(" Error : unsupport operation for class ");
+    assert(false);
+    return Universe::HiNone;
 }
 

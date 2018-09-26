@@ -21,6 +21,7 @@ private:
     HiDict* _obj_dict;
 
 public:
+    HiObject();
     Klass* klass()             { assert(_klass != NULL); return _klass; }
     void set_klass(Klass* x)   { _klass = x; }
 
