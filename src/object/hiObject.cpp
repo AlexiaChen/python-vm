@@ -88,6 +88,12 @@ HiObject* HiObject::getattr(HiObject* x) {
 }
 
 HiObject* HiObject::setattr(HiObject* x, HiObject* y) {
+    if (klass() == TypeKlass::get_instance()) {
+        HiTypeObject* type_obj = (HiTypeObject*)this;
+        type_obj->own_klass()->klass_dict()->put(x, y);
+        return Universe::HiNone;
+    }
+
     if (!_obj_dict)
         _obj_dict = new HiDict();
 

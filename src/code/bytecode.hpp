@@ -14,7 +14,7 @@ public:
     static const unsigned char BINARY_SUBSCR = 25;
     static const unsigned char BINARY_DIVIDE = 21;
     static const unsigned char BINARY_ADD = 23;
-    static const unsigned char BINARY_SUBSTRACT = 24;
+    static const unsigned char BINARY_SUBTRACT = 24;
 
     static const unsigned char INPLACE_ADD = 55;
     static const unsigned char STORE_MAP = 54;
@@ -47,6 +47,7 @@ public:
     static const unsigned char DUP_TOPX = 99;   /* number of items to duplicate */
     static const unsigned char LOAD_CONST = 100; /* Index in const list */
     static const unsigned char LOAD_NAME = 101; /* Index in name list */
+    static const unsigned char BUILD_TUPLE = 102;
     static const unsigned char BUILD_LIST = 103;
     static const unsigned char BUILD_MAP = 105;
     static const unsigned char LOAD_ATTR = 106; /* Index in name list */
