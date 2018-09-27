@@ -16,6 +16,7 @@ public:
     HiString* mod_str;
     HiString* init_str;
     HiString* add_str;
+    HiString* len_str;
 };
 
 #endif

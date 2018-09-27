@@ -125,6 +125,10 @@ HiObject* HiObject::iter() {
     return klass()->iter(this);
 }
 
+HiObject* HiObject::len() {
+    return klass()->len(this);
+}
+
 /*
  * TypeObject is a special object
  */

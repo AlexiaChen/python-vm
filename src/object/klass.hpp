@@ -62,6 +62,7 @@ public:
     virtual HiObject* allocate_instance(HiObject* type_object, ArrayList<HiObject*>* args);
 
     virtual HiObject* iter(HiObject* x) { return 0; }
+    virtual HiObject* len(HiObject* x);
 };
 
 #endif

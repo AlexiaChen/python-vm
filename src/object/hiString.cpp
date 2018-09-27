@@ -127,3 +127,7 @@ HiObject* StringKlass::allocate_instance(HiObject* callable,
         return NULL;
 }
 
+HiObject* StringKlass::len(HiObject* x) {
+    return new HiInteger(((HiString*)x)->length());
+}
+

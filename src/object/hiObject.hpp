@@ -49,6 +49,7 @@ public:
     HiObject* contains(HiObject* x);
 
     HiObject* iter();
+    HiObject* len();
 };
 
 /*

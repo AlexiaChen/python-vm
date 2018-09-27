@@ -73,9 +73,6 @@ HiObject* Klass::add(HiObject* lhs, HiObject* rhs) {
 HiObject* Klass::find_and_call(HiObject* lhs, ObjList args, HiObject* func_name) {
     HiObject* func = lhs->getattr(func_name);
     if (func != Universe::HiNone) {
-        if (!args)
-            args = new ArrayList<HiObject*>();
-
         return Interpreter::get_instance()->call_virtual(func, args);
     }
 
@@ -84,5 +81,9 @@ HiObject* Klass::find_and_call(HiObject* lhs, ObjList args, HiObject* func_name)
     printf(" Error : unsupport operation for class ");
     assert(false);
     return Universe::HiNone;
+}
+
+HiObject* Klass::len(HiObject* x) {
+    return find_and_call(x, NULL, ST(len));
 }
 
