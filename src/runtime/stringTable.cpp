@@ -16,5 +16,6 @@ StringTable::StringTable() {
     init_str = new HiString("__init__");
     add_str  = new HiString("__add__");
     len_str  = new HiString("__len__");
+    call_str = new HiString("__call__");
 }
 
