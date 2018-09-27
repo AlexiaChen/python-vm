@@ -56,6 +56,7 @@ HiObject* list_remove(ObjList args);
 HiObject* list_reverse(ObjList args);
 HiObject* list_sort(ObjList args);
 HiObject* list_extend(ObjList args);
+HiObject* list_index(ObjList args);
 
 class ListIteratorKlass : public Klass {
 private:

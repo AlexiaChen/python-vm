@@ -354,7 +354,7 @@ void Interpreter::eval_frame() {
                     break;
 
                 case ByteCode::IN:
-                    PUSH(v->contains(w));
+                    PUSH(w->contains(v));
                     break;
 
                 case ByteCode::IS:

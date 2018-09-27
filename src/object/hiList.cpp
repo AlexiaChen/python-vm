@@ -31,6 +31,8 @@ ListKlass::ListKlass() {
         new FunctionObject(list_sort));
     klass_dict->put(new HiString("extend"), 
         new FunctionObject(list_extend));
+    klass_dict->put(new HiString("index"), 
+        new FunctionObject(list_index));
     set_klass_dict(klass_dict);
 
     (new HiTypeObject())->set_own_klass(this);
@@ -255,6 +257,21 @@ HiObject* list_reverse(ObjList args) {
     }
 
     return Universe::HiNone;
+}
+
+HiObject* list_index(ObjList args) {
+    HiList* list = (HiList*)(args->get(0));
+    HiObject* target = (HiObject*)(args->get(1));
+
+    assert(list && list->klass() == ListKlass::get_instance());
+
+    for (int i = 0; i < list->inner_list()->size(); i++) {
+        if (list->get(i)->equal(target) == (HiObject*)Universe::HiTrue) {
+            return new HiInteger(i);
+        }
+    }
+
+    return NULL;
 }
 
 /*

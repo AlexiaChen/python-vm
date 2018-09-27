@@ -71,38 +71,13 @@ HiObject* HiObject::le(HiObject * rhs) {
 }
 
 HiObject* HiObject::getattr(HiObject* x) {
-    HiObject* result = Universe::HiNone;
-
-    if (_obj_dict != NULL) {
-        result = _obj_dict->get(x);
-        if (result != Universe::HiNone)
-            return result;
-    }
-
-    result = klass()->klass_dict()->get(x);
-
-    if (result == Universe::HiNone)
-        return result;
-
-    // Only klass attribute needs bind.
-    if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject*)result, this);
-    }
-    return result;
+    return klass()->getattr(this, x);
 }
 
 HiObject* HiObject::setattr(HiObject* x, HiObject* y) {
+    return klass()->setattr(this, x, y);
     if (klass() == TypeKlass::get_instance()) {
-        HiTypeObject* type_obj = (HiTypeObject*)this;
-        type_obj->own_klass()->klass_dict()->put(x, y);
-        return Universe::HiNone;
     }
-
-    if (!_obj_dict)
-        _obj_dict = new HiDict();
-
-    _obj_dict->put(x, y);
-    return Universe::HiNone;
 }
 
 HiObject* HiObject::subscr(HiObject* x) {
@@ -160,6 +135,12 @@ void TypeKlass::print(HiObject* obj) {
     printf(">");
 }
 
+HiObject* TypeKlass::setattr(HiObject* x, HiObject* y, HiObject* z) {
+    HiTypeObject* type_obj = (HiTypeObject*)x;
+    type_obj->own_klass()->klass_dict()->put(y, z);
+    return Universe::HiNone;
+}
+
 HiTypeObject::HiTypeObject() {
     set_klass(TypeKlass::get_instance());
 }
@@ -169,3 +150,6 @@ void HiTypeObject::set_own_klass(Klass* k) {
     k->set_type_object(this);
 }
 
+void HiObject::init_dict() {
+    _obj_dict = new HiDict();
+}

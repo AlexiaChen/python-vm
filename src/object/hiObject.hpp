@@ -50,6 +50,9 @@ public:
 
     HiObject* iter();
     HiObject* len();
+
+    HiDict* obj_dict()   { return _obj_dict; }
+    void init_dict();
 };
 
 /*
@@ -64,6 +67,7 @@ public:
     static TypeKlass* get_instance();
 
     virtual void print(HiObject* obj);
+    virtual HiObject* setattr(HiObject* x, HiObject* y, HiObject* z);
 };
 
 class HiTypeObject : public HiObject {
