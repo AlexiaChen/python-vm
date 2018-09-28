@@ -1,4 +1,5 @@
 #include "object/hiInteger.hpp"
+#include "object/hiList.hpp"
 #include "object/hiString.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
@@ -14,6 +15,10 @@ FunctionKlass* FunctionKlass::get_instance() {
 }
 
 FunctionKlass::FunctionKlass() {
+    add_super(ObjectKlass::get_instance());
+    set_name(new HiString("function"));
+    HiTypeObject* tp_obj = new HiTypeObject();
+    tp_obj->set_own_klass(this);
 }
 
 void FunctionKlass::print(HiObject* obj) {
@@ -73,8 +78,10 @@ NativeFunctionKlass* NativeFunctionKlass::get_instance() {
 }
 
 NativeFunctionKlass::NativeFunctionKlass() {
-    set_super(FunctionKlass::get_instance());
+    add_super(FunctionKlass::get_instance());
     set_name(new HiString("native function"));
+    HiTypeObject* tp_obj = new HiTypeObject();
+    tp_obj->set_own_klass(this);
 }
 
 HiObject* FunctionObject::call(ObjList args) {
@@ -95,46 +102,10 @@ MethodKlass* MethodKlass::get_instance() {
 }
 
 MethodKlass::MethodKlass() {
-    set_klass_dict(new HiDict());
-    set_super(FunctionKlass::get_instance());
+    add_super(FunctionKlass::get_instance());
     set_name(new HiString("method"));
-}
-
-/*
- * To check the type of a callable object.
- */
-bool MethodObject::is_native(HiObject *x) {
-    Klass* k = x->klass();
-    if (k == (Klass*) NativeFunctionKlass::get_instance())
-        return true;
-
-    while (k->super() != NULL) {
-        k = k->super();
-        if (k == (Klass*) NativeFunctionKlass::get_instance())
-            return true;
-    }
-    return false;
-}
-
-bool MethodObject::is_method(HiObject *x) {
-    if (x->klass() == (Klass*) MethodKlass::get_instance())
-        return true;
-
-    return false;
-}
-
-bool MethodObject::is_function(HiObject *x) {
-    Klass* k = x->klass();
-    if (k == (Klass*) FunctionKlass::get_instance())
-        return true;
-
-    while (k->super() != NULL) {
-        k = k->super();
-        if (k == (Klass*) FunctionKlass::get_instance())
-            return true;
-    }
-
-    return false;
+    HiTypeObject* tp_obj = new HiTypeObject();
+    tp_obj->set_own_klass(this);
 }
 
 HiObject* len(ObjList args) {
@@ -177,13 +148,34 @@ HiObject* isinstance(ObjList args) {
     assert(y && y->klass() == TypeKlass::get_instance());
 
     Klass* k = x->klass();
-    while (k != NULL) {
-        if (k == ((HiTypeObject*)y)->own_klass())
+    for (int i = 0; i < k->mro()->size(); i++) {
+        if (k->mro()->get(i) == y) {
             return Universe::HiTrue;
-
-        k = k->super();
+        }
     }
 
     return Universe::HiFalse;
+}
+
+HiObject* builtin_super(ObjList args) {
+    return NULL;
+}
+
+bool MethodObject::is_function(HiObject *x) {
+    Klass* k = x->klass();
+    if (k == (Klass*) FunctionKlass::get_instance())
+        return true;
+
+    if (k->mro() == NULL) 
+        return false;
+
+    for (int i = 0; i < k->mro()->size(); i++) {
+        if (k->mro()->get(i) == 
+                FunctionKlass::get_instance()->type_object()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 

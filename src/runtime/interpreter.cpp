@@ -43,6 +43,7 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("len"),      new FunctionObject(len));
     _builtins->put(new HiString("type"),     new FunctionObject(type_of));
     _builtins->put(new HiString("isinstance"),new FunctionObject(isinstance));
+    _builtins->put(new HiString("super"),    new FunctionObject(builtin_super));
 
     _builtins->put(new HiString("int"),      IntegerKlass::get_instance()->type_object());
     _builtins->put(new HiString("object"),   ObjectKlass::get_instance()->type_object());
@@ -55,7 +56,7 @@ void Interpreter::build_frame(HiObject* callable, ObjList args) {
     if (callable->klass() == NativeFunctionKlass::get_instance()) {
         PUSH(((FunctionObject*)callable)->call(args));
     }
-    else if (MethodObject::is_method(callable)) {
+    else if (callable->klass() == MethodKlass::get_instance()) {
         MethodObject* method = (MethodObject*) callable;
         // return value is ignored here, because they are handled
         // by other pathes.
@@ -103,7 +104,7 @@ HiObject* Interpreter::call_virtual(HiObject* func, ObjList args) {
         // we do not create a virtual frame, but native frame.
         return ((FunctionObject*)func)->call(args);
     }
-    else if (MethodObject::is_method(func)) {
+    else if (func->klass() == MethodKlass::get_instance()) {
         MethodObject* method = (MethodObject*) func;
         if (!args) {
             args = new ArrayList<HiObject*>(1);

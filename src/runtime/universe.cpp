@@ -1,7 +1,9 @@
 #include "runtime/universe.hpp"
+#include "runtime/functionObject.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiObject.hpp"
 #include "object/hiString.hpp"
+#include "object/hiList.hpp"
 #include "object/hiDict.hpp"
 
 HiObject* Universe::HiTrue   = NULL;
@@ -23,20 +25,34 @@ void Universe::genesis() {
 
     HiTypeObject* tp_obj = new HiTypeObject();
     tp_obj->set_own_klass(type_klass);
-    type_klass->set_super(object_klass);
 
     HiTypeObject* obj_obj = new HiTypeObject();
     obj_obj->set_own_klass(object_klass);
-    object_klass->set_super(NULL);
 
-    DictKlass::get_instance()->initialize();
+    type_klass->add_super(object_klass);
+    // do nothing for object klass
+    //object_klass->add_super(NULL);
+
+    IntegerKlass::get_instance()->initialize();
     StringKlass::get_instance()->initialize();
+    DictKlass::get_instance()->initialize();
+    ListKlass::get_instance()->initialize();
 
     type_klass->set_klass_dict(new HiDict());
     object_klass->set_klass_dict(new HiDict());
 
     type_klass->set_name(new HiString("type"));
     object_klass->set_name(new HiString("object"));
+
+    IntegerKlass::get_instance()->order_supers();
+    StringKlass::get_instance()->order_supers();
+    DictKlass::get_instance()->order_supers();
+    ListKlass::get_instance()->order_supers();
+    type_klass->order_supers();
+
+    FunctionKlass::get_instance()->order_supers();
+    NativeFunctionKlass::get_instance()->order_supers();
+    MethodKlass::get_instance()->order_supers();
 }
 
 void Universe::destroy() {

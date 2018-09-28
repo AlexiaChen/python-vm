@@ -92,8 +92,6 @@ public:
     HiObject* owner()              { return _owner; }
     FunctionObject* func()         { return _func; }
 
-    static bool is_native(HiObject* x);
-    static bool is_method(HiObject* x);
     static bool is_function(HiObject* x);
 };
 
@@ -109,5 +107,6 @@ public:
 HiObject* len(ObjList args);
 HiObject* type_of(ObjList args);
 HiObject* isinstance(ObjList args);
+HiObject* builtin_super(ObjList args);
 
 #endif

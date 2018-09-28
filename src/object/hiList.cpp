@@ -18,6 +18,9 @@ ListKlass* ListKlass::get_instance() {
 }
 
 ListKlass::ListKlass() {
+}
+
+void ListKlass::initialize() {
     HiDict * klass_dict = new HiDict();
     klass_dict->put(new HiString("append"), 
         new FunctionObject(list_append));
@@ -33,11 +36,13 @@ ListKlass::ListKlass() {
         new FunctionObject(list_extend));
     klass_dict->put(new HiString("index"), 
         new FunctionObject(list_index));
+    klass_dict->put(new HiString("__getitem__"), 
+        new FunctionObject(list_getitem));
     set_klass_dict(klass_dict);
 
     (new HiTypeObject())->set_own_klass(this);
     set_name(new HiString("list"));
-    set_super(ObjectKlass::get_instance());
+    add_super(ObjectKlass::get_instance());
 }
 
 HiObject* ListKlass::add(HiObject* x, HiObject* y) {
@@ -259,6 +264,16 @@ HiObject* list_reverse(ObjList args) {
     return Universe::HiNone;
 }
 
+int HiList::index(HiObject* t) {
+    for (int i = 0; i < size(); i++) {
+        if (get(i) == t) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 HiObject* list_index(ObjList args) {
     HiList* list = (HiList*)(args->get(0));
     HiObject* target = (HiObject*)(args->get(1));
@@ -272,6 +287,14 @@ HiObject* list_index(ObjList args) {
     }
 
     return NULL;
+}
+
+HiObject* list_getitem(ObjList args) {
+    HiList* list = (HiList*)(args->get(0));
+    HiObject* y = (HiObject*)(args->get(1));
+
+    HiInteger* iy = (HiInteger*)y;
+    return list->inner_list()->get(iy->value());
 }
 
 /*

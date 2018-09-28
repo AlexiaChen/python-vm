@@ -8,7 +8,6 @@
 ObjectKlass* ObjectKlass::instance = NULL;
 
 ObjectKlass::ObjectKlass() {
-    set_super(NULL);
 }
 
 ObjectKlass* ObjectKlass::get_instance() {
