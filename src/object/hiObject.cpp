@@ -4,6 +4,8 @@
 #include "runtime/universe.hpp"
 #include "runtime/stringTable.hpp"
 #include "runtime/functionObject.hpp"
+#include "memory/heap.hpp"
+#include "memory/oopClosure.hpp"
 
 ObjectKlass* ObjectKlass::instance = NULL;
 
@@ -22,6 +24,7 @@ void HiObject::print() {
 }
 
 HiObject::HiObject() {
+    _mark_word = 0;
     _obj_dict = NULL;
 }
 
@@ -140,6 +143,14 @@ HiObject* TypeKlass::setattr(HiObject* x, HiObject* y, HiObject* z) {
     return Universe::HiNone;
 }
 
+size_t TypeKlass::size() {
+    return sizeof(HiTypeObject);
+}
+
+void TypeKlass::oops_do(OopClosure* f, HiObject* obj) {
+    // do nothing since HiTypeObject refers no oop.
+}
+
 HiTypeObject::HiTypeObject() {
     set_klass(TypeKlass::get_instance());
 }
@@ -152,3 +163,35 @@ void HiTypeObject::set_own_klass(Klass* k) {
 void HiObject::init_dict() {
     _obj_dict = new HiDict();
 }
+
+/*
+ * Interfaces for GC.
+ */
+void HiObject::oops_do(OopClosure* closure) {
+    // object does not know who to visit, klass knows
+    closure->do_oop((HiObject**)&_obj_dict);
+    klass()->oops_do(closure, this);
+}
+
+char* HiObject::new_address() {
+    if ((_mark_word & 0x1) == 0x1)
+        return (char*)(_mark_word & ((long)-8));
+
+    return NULL;
+}
+
+void HiObject::set_new_address(char* addr) {
+    if (!addr)
+        return;
+
+    _mark_word = ((long)addr) | 0x1;
+}
+
+void* HiObject::operator new(size_t size) {
+    return Universe::heap->allocate(size);
+}
+
+size_t HiObject::size() {
+    return klass()->size();
+}
+

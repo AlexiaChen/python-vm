@@ -2,6 +2,7 @@
 #include "code/binaryFileParser.hpp"
 #include "runtime/interpreter.hpp"
 #include "runtime/universe.hpp"
+#include "memory/heap.hpp"
 
 int main(int argc, char** argv) {
     if (argc <= 1) {
@@ -9,12 +10,13 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    Universe::genesis();
     BufferedInputStream stream(argv[1]);
     BinaryFileParser parser(&stream);
-    CodeObject* main_code = parser.parse();
-    Universe::genesis();
+    Universe::main_code = parser.parse();
+    Universe::heap->gc();
 
-    Interpreter::get_instance()->run(main_code);
+    Interpreter::get_instance()->run(Universe::main_code);
 
     return 0;
 }

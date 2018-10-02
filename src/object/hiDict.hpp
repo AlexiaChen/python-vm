@@ -23,6 +23,9 @@ public:
 
     virtual HiObject* allocate_instance(HiObject* callable, 
             ArrayList<HiObject*>* args);
+
+    virtual size_t size();
+    virtual void oops_do(OopClosure* f, HiObject* obj);
 };
 
 class HiDict : public HiObject {

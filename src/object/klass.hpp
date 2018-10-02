@@ -73,6 +73,15 @@ public:
 
     virtual HiObject* iter(HiObject* x) { return 0; }
     virtual HiObject* len(HiObject* x);
+
+    // gc interfaces
+    // this is for objects of this type.
+    virtual void oops_do(OopClosure* closure, HiObject* obj);
+    // for klass itself only.
+    virtual void oops_do(OopClosure* closure);
+    virtual size_t size();
+
+    void* operator new(size_t size);
 };
 
 #endif

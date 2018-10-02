@@ -6,6 +6,7 @@
 
 class FrameObject;
 class HiDict;
+class OopClosure;
 
 class Interpreter {
 private:
@@ -27,6 +28,8 @@ public:
     void      eval_frame      ();
     void      leave_frame     ();
     HiObject* call_virtual    (HiObject* func, ObjList args);
+
+    void      oops_do         (OopClosure* f);
 };
 
 #endif

@@ -1,6 +1,8 @@
 #include "util/map.hpp"
 #include "runtime/universe.hpp"
 #include "object/hiObject.hpp"
+#include "memory/heap.hpp"
+#include "memory/oopClosure.hpp"
 
 template <typename K, typename V>
 Map<K, V>::Map() {
@@ -62,7 +64,7 @@ void Map<K, V>::expand() {
             new_entries[i] = _entries[i];
         }
         _length <<= 1;
-        delete[] _entries;
+        //delete[] _entries;
         _entries = new_entries;
     }
 }
@@ -87,6 +89,26 @@ K Map<K, V>::get_key(int index) {
 template <typename K, typename V>
 V Map<K, V>::get_value(int index) {
     return _entries[index]._v;
+}
+
+template <typename K, typename V>
+void* MapEntry<K, V>::operator new[](size_t size) {
+    return Universe::heap->allocate(size);
+}
+
+template <typename K, typename V>
+void Map<K, V>::oops_do(OopClosure* closure) {
+    closure->do_raw_mem((char**)(&_entries), 
+            _length * sizeof(MapEntry<K, V>));
+    for (int i = 0; i < _size; i++) {
+        closure->do_oop(&(_entries[i]._k));
+        closure->do_oop(&(_entries[i]._v));
+    }
+}
+
+template <typename K, typename V>
+void* Map<K, V>::operator new(size_t size) {
+    return Universe::heap->allocate(size);
 }
 
 template class Map<HiObject*, HiObject*>;

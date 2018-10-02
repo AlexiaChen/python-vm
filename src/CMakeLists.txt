@@ -14,11 +14,14 @@ ADD_EXECUTABLE(railgun main.cpp
     object/klass.cpp
     util/arrayList.cpp
     util/map.cpp
+    util/handles.cpp
     runtime/interpreter.cpp
     runtime/universe.cpp
     runtime/frameObject.cpp
     runtime/functionObject.cpp
     runtime/stringTable.cpp
+    memory/heap.cpp
+    memory/oopClosure.cpp
     code/binaryFileParser.cpp
     code/codeObject.cpp)
     

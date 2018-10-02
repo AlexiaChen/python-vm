@@ -9,6 +9,7 @@
 #include "object/hiInteger.hpp"
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
+#include "memory/oopClosure.hpp"
 
 #include <string.h>
 
@@ -44,12 +45,15 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("type"),     new FunctionObject(type_of));
     _builtins->put(new HiString("isinstance"),new FunctionObject(isinstance));
     _builtins->put(new HiString("super"),    new FunctionObject(builtin_super));
+    _builtins->put(new HiString("sysgc"),    new FunctionObject(sysgc));
 
     _builtins->put(new HiString("int"),      IntegerKlass::get_instance()->type_object());
     _builtins->put(new HiString("object"),   ObjectKlass::get_instance()->type_object());
     _builtins->put(new HiString("str"),      StringKlass::get_instance()->type_object());
     _builtins->put(new HiString("list"),     ListKlass::get_instance()->type_object());
     _builtins->put(new HiString("dict"),     DictKlass::get_instance()->type_object());
+
+    _frame = NULL;
 }
 
 void Interpreter::build_frame(HiObject* callable, ObjList args) {
@@ -469,5 +473,12 @@ void Interpreter::eval_frame() {
                 printf("Error: Unrecognized byte code %d\n", op_code);
         }
     }
+}
+
+void Interpreter::oops_do(OopClosure* f) {
+    f->do_oop((HiObject**)&_builtins);
+
+    if (_frame)
+        _frame->oops_do(f);
 }
 

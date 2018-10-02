@@ -6,6 +6,7 @@
 #include "runtime/interpreter.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "memory/oopClosure.hpp"
 #include <assert.h>
 
 ListKlass* ListKlass::instance = NULL;
@@ -349,3 +350,12 @@ HiObject* ListKlass::len(HiObject* x) {
     return new HiInteger(((HiList*)x)->size());
 }
 
+void ListKlass::oops_do(OopClosure* f, HiObject* obj) {
+    assert(obj && obj->klass() == (Klass*) this);
+
+    f->do_array_list(&((HiList*)obj)->_inner_list);
+}
+
+size_t ListKlass::size() {
+    return sizeof(HiList);
+}

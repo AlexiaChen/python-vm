@@ -3,6 +3,7 @@
 #include "object/hiString.hpp"
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
+#include "memory/oopClosure.hpp"
 
 // this constructor is used for module only.
 FrameObject::FrameObject(CodeObject* codes) {
@@ -30,7 +31,7 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args) {
 
     _locals  = new HiDict();
     _globals = func->_globals;
-    _fast_locals = new ArrayList<HiObject*>();
+    _fast_locals = new HiList();
 
     if (func->_defaults) {
         int dft_cnt = func->_defaults->length();
@@ -68,3 +69,20 @@ unsigned char FrameObject::get_op_code() {
 bool FrameObject::has_more_codes() {
     return _pc < _codes->_bytecodes->length();
 }
+
+void FrameObject::oops_do(OopClosure* f) {
+    f->do_array_list(&_consts);
+    f->do_array_list(&_names);
+
+    f->do_oop((HiObject**)&_globals);
+    f->do_oop((HiObject**)&_locals);
+
+    f->do_oop((HiObject**)&_fast_locals);
+    f->do_oop((HiObject**)&_stack);
+
+    f->do_oop((HiObject**)&_codes);
+
+    if (_sender)
+        _sender->oops_do(f);
+}
+

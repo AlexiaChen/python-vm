@@ -46,6 +46,15 @@ HiObject* IntegerKlass::allocate_instance(HiObject* callable,
         return NULL;
 }
 
+size_t IntegerKlass::size() {
+    return sizeof(HiInteger);
+}
+
+void IntegerKlass::oops_do(OopClosure* f, HiObject* obj) {
+    // do nothing
+    // only overwrite warning message in Klass
+}
+
 HiObject* IntegerKlass::greater(HiObject* x, HiObject* y) {
     HiInteger* ix = (HiInteger*) x;
     HiInteger* iy = (HiInteger*) y;

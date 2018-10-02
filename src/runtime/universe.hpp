@@ -4,8 +4,11 @@
 #include <stdio.h>
 
 class Klass;
+class Heap;
 class HiInteger;
 class HiObject;
+class OopClosure;
+class CodeObject;
 
 template <typename T>
 class ArrayList;
@@ -18,9 +21,12 @@ public:
     static HiObject* HiNone;
     static ArrayList<Klass*>* klasses;
 
+    static CodeObject* main_code;
+    static Heap* heap;
 public:
     static void genesis();
     static void destroy();
+    static void oops_do(OopClosure* closure);
 };
 
 #endif

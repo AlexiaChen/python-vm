@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+class OopClosure;
+
 template <typename T>
 class ArrayList {
 private:
@@ -23,6 +25,10 @@ public:
     int  length();
     T    pop();
     void delete_index(int index);
+
+    void* operator new(size_t size);
+
+    void oops_do(OopClosure* closure);
 };
 
 class HiObject;
