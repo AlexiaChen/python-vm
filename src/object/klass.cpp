@@ -111,7 +111,7 @@ void Klass::store_subscr(HiObject* x, HiObject* y, HiObject* z) {
 }
 
 HiObject* Klass::getattr(HiObject* x, HiObject* y) {
-    HiObject* func = x->klass()->klass_dict()->get(ST(getattr));
+    HiObject* func = find_in_parents(x, ST(getattr));
     if (func->klass() == FunctionKlass::get_instance()) {
         func = new MethodObject((FunctionObject*)func, x);
         ObjList args = new ArrayList<HiObject*>();
@@ -127,28 +127,7 @@ HiObject* Klass::getattr(HiObject* x, HiObject* y) {
             return result;
     }
 
-    result = x->klass()->klass_dict()->get(y);
-
-    if (result != Universe::HiNone) {
-        // klass attribute needs bind.
-        if (MethodObject::is_function(result)) {
-            result = new MethodObject((FunctionObject*)result, x);
-        }
-        return result;
-    }
-
-    // find attribute in all parents.
-    if (_mro == NULL)
-        return result;
-
-    for (int i = 0; i < _mro->size(); i++) {
-        result = ((HiTypeObject*)(_mro->get(i)))
-            ->own_klass()->klass_dict()->get(y);
-
-        if (result != Universe::HiNone)
-            break;
-    }
-
+    result = find_in_parents(x, y);
     if (MethodObject::is_function(result)) {
         result = new MethodObject((FunctionObject*)result, x);
     }
@@ -220,7 +199,7 @@ void Klass::order_supers() {
             }
             cur = index;
 
-            if (index > 0) {
+            if (index >= 0) {
                 _mro->delete_index(index);
             }
             _mro->append(tp_obj);
@@ -239,3 +218,25 @@ void Klass::order_supers() {
     printf("\n");
 }
 
+HiObject* Klass::find_in_parents(HiObject* x, HiObject* y) {
+    HiObject* result = Universe::HiNone;
+    result = x->klass()->klass_dict()->get(y);
+
+    if (result != Universe::HiNone) {
+        return result;
+    }
+
+    // find attribute in all parents.
+    if (x->klass()->mro() == NULL)
+        return result;
+
+    for (int i = 0; i < x->klass()->mro()->size(); i++) {
+        result = ((HiTypeObject*)(x->klass()->mro()->get(i)))
+            ->own_klass()->klass_dict()->get(y);
+
+        if (result != Universe::HiNone)
+            break;
+    }
+
+    return result;
+}

@@ -21,6 +21,7 @@ private:
     HiDict*       _klass_dict;
 
     HiObject* find_and_call(HiObject* x, ObjList args, HiObject* func_name); 
+    HiObject* find_in_parents(HiObject* x, HiObject* y);
 public:
     Klass();
 
