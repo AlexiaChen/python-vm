@@ -1,6 +1,7 @@
 #include "runtime/universe.hpp"
 #include "memory/heap.hpp"
 #include "memory/oopClosure.hpp"
+#include <stdlib.h>
 
 Heap*  Heap::instance = NULL;
 size_t Heap::MAX_CAP = 2 * 1024 * 1024;
