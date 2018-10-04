@@ -73,7 +73,7 @@ template <typename K, typename V>
 V Map<K, V>::remove(K k) {
     int i = index(k);
 
-    if (k < 0)
+    if (i < 0)
         return 0; 
 
     V v = _entries[i]._v;
