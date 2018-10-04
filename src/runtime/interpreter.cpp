@@ -267,6 +267,7 @@ void Interpreter::eval_frame() {
                 printf("\n");
                 break;
 
+            case ByteCode::INPLACE_ADD:
             case ByteCode::BINARY_ADD:
                 v = POP();
                 w = POP();

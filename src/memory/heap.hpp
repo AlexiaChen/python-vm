@@ -2,7 +2,6 @@
 #define MEMORY_HEAP_HPP
 
 #include <memory.h>
-#include <malloc.h>
 
 class HiObject;
 
