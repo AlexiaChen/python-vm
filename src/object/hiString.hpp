@@ -15,6 +15,7 @@ public:
     virtual HiObject* equal    (HiObject* x, HiObject* y);
 
     virtual void print(HiObject* obj);
+    virtual HiObject* add    (HiObject* x, HiObject* y);
     virtual HiObject* less   (HiObject* x, HiObject* y);
     virtual HiObject* subscr (HiObject* x, HiObject* y);
     virtual HiObject* len    (HiObject* x);
@@ -34,10 +35,12 @@ private:
 public:
     HiString(const char * x);
     HiString(const char * x, const int length);
+    HiString(const int len);
 
     const char* value()     { return _value; }
-    char** value_address()  { return &_value; };
+    char** value_address()  { return &_value; }
     int length()            { return _length; }
+    void set(int i, char x) { _value[i] = x; }
 };
 
 #endif

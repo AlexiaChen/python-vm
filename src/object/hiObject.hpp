@@ -53,6 +53,7 @@ public:
     HiObject* len();
 
     HiDict* obj_dict()   { return _obj_dict; }
+    void set_obj_dict(HiDict* x) { _obj_dict = x; }
     void init_dict();
 
     void* operator new(size_t size);

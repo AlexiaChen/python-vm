@@ -12,7 +12,6 @@ FrameObject::FrameObject(CodeObject* codes) {
     
     _locals  = new HiDict();
     _globals = _locals;
-    _locals->put(new HiString("__name__"), new HiString("__main__"));
     _fast_locals = NULL;
 
     _stack   = new HiList();

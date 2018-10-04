@@ -23,6 +23,7 @@ public:
     void set(int index, T t);
     int  size();
     int  length();
+    T*   value()  { return _array; }
     T    pop();
     void delete_index(int index);
 

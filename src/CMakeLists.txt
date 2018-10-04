@@ -20,6 +20,7 @@ ADD_EXECUTABLE(railgun main.cpp
     runtime/frameObject.cpp
     runtime/functionObject.cpp
     runtime/stringTable.cpp
+    runtime/module.cpp
     memory/heap.cpp
     memory/oopClosure.cpp
     code/binaryFileParser.cpp

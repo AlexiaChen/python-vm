@@ -90,6 +90,12 @@ HiString::HiString(const char * x, const int length) {
     set_klass(StringKlass::get_instance());
 }
 
+HiString::HiString(const int length) {
+    _length = length;
+    _value = (char*)Universe::heap->allocate(_length);
+    set_klass(StringKlass::get_instance());
+}
+
 HiObject* StringKlass::less(HiObject* x, HiObject* y) {
     HiString* sx = (HiString*) x;
     assert(sx && (sx->klass() == (Klass *)this));
@@ -131,6 +137,29 @@ HiObject* StringKlass::allocate_instance(HiObject* callable,
 
 HiObject* StringKlass::len(HiObject* x) {
     return new HiInteger(((HiString*)x)->length());
+}
+
+HiObject* StringKlass::add(HiObject* x, HiObject* y) {
+    assert(x && x->klass() == this);
+    assert(y && y->klass() == this);
+
+    HiString* sx = (HiString*)x;
+    HiString* sy = (HiString*)y;
+
+    HiString* sz = new HiString(sx->length() + sy->length() + 1);
+
+    int i, j;
+    for (i = 0; i < sx->length(); i++) {
+        sz->set(i, sx->value()[i]);
+    }
+
+    for (j = 0; j < sy->length(); j++) {
+        sz->set(sx->length() + j, sy->value()[j]);
+    }
+
+    sz->set(i + j, '\0');
+
+    return sz;
 }
 
 void StringKlass::oops_do(OopClosure* closure, HiObject* obj) {

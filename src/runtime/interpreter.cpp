@@ -3,6 +3,7 @@
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
 #include "runtime/stringTable.hpp"
+#include "runtime/module.hpp"
 #include "util/arrayList.hpp"
 #include "util/map.hpp"
 #include "object/hiString.hpp"
@@ -35,7 +36,11 @@ Interpreter* Interpreter::get_instance() {
 }
 
 Interpreter::Interpreter() {
-    _builtins = new HiDict();
+    _frame = NULL;
+}
+
+void Interpreter::initialize() {
+    _builtins = ModuleObject::import_module(new HiString("lib/builtin"));
 
     _builtins->put(new HiString("True"),     Universe::HiTrue);
     _builtins->put(new HiString("False"),    Universe::HiFalse);
@@ -52,8 +57,6 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("str"),      StringKlass::get_instance()->type_object());
     _builtins->put(new HiString("list"),     ListKlass::get_instance()->type_object());
     _builtins->put(new HiString("dict"),     DictKlass::get_instance()->type_object());
-
-    _frame = NULL;
 }
 
 void Interpreter::build_frame(HiObject* callable, ObjList args) {
@@ -135,8 +138,21 @@ void Interpreter::enter_frame(FrameObject* frame) {
 
 void Interpreter::run(CodeObject* codes) {
     _frame = new FrameObject(codes);
+    _frame->locals()->put(ST(name), new HiString("__main__"));
     eval_frame();
     destroy_frame();
+}
+
+HiDict* Interpreter::run_mod(CodeObject* codes, HiString* mod_name) {
+    FrameObject* frame = new FrameObject(codes);
+    frame->set_entry_frame(true);
+    frame->locals()->put(ST(name), mod_name);
+
+    enter_frame(frame);
+    eval_frame();
+    HiDict* result = frame->locals();
+    destroy_frame();
+    return result;
 }
 
 void Interpreter::eval_frame() {
@@ -283,6 +299,13 @@ void Interpreter::eval_frame() {
                 v = POP();
                 w = POP();
                 PUSH(w->mul(v));
+                break;
+
+            case ByteCode::INPLACE_MODULO: // drop down
+            case ByteCode::BINARY_MODULO:
+                v = POP();
+                w = POP();
+                PUSH(w->mod(v));
                 break;
 
             case ByteCode::MAKE_FUNCTION:
@@ -469,6 +492,11 @@ void Interpreter::eval_frame() {
                 }
                 break;
 
+            case ByteCode::IMPORT_NAME:
+                v = _frame->names()->get(op_arg);
+                PUSH(ModuleObject::import_module(v));
+                break;
+
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
         }
@@ -477,6 +505,7 @@ void Interpreter::eval_frame() {
 
 void Interpreter::oops_do(OopClosure* f) {
     f->do_oop((HiObject**)&_builtins);
+    f->do_oop((HiObject**)&_ret_value);
 
     if (_frame)
         _frame->oops_do(f);

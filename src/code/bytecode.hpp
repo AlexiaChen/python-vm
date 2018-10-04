@@ -52,6 +52,8 @@ public:
     static const unsigned char BUILD_MAP = 105;
     static const unsigned char LOAD_ATTR = 106; /* Index in name list */
     static const unsigned char COMPARE_OP = 107; /* Comparison operator */
+    static const unsigned char IMPORT_NAME = 108; /* Index in name list */
+    static const unsigned char IMPORT_FROM = 109; /* Index in name list */
     static const unsigned char JUMP_FORWARD = 110; /* Number of bytes to skip */
     static const unsigned char JUMP_IF_FALSE_OR_POP = 111; /* Target byte offset from beginning
                                     of code */
