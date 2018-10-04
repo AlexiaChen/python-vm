@@ -1,8 +1,9 @@
 #include "object/hiDict.hpp"
 #include "runtime/module.hpp"
+#include "runtime/interpreter.hpp"
 #include "util/bufferedInputStream.hpp"
 #include "code/binaryFileParser.hpp"
-#include "runtime/interpreter.hpp"
+#include "memory/oopClosure.hpp"
 
 ModuleKlass* ModuleKlass::_instance = NULL;
 
@@ -47,3 +48,11 @@ HiObject* ModuleObject::get(HiObject* x) {
     return obj_dict()->get(x);
 }
 
+size_t ModuleKlass::size() {
+    return sizeof(ModuleObject);
+}
+
+void ModuleKlass::oops_do(OopClosure* f, HiObject* obj) {
+    void* temp = &(((ModuleObject*)obj)->_mod_name);
+    f->do_oop((HiObject**)temp);
+}

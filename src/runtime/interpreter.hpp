@@ -12,6 +12,7 @@ class ModuleObject;
 class Interpreter {
 private:
     ModuleObject*         _builtins;
+    HiDict*               _modules;
     FrameObject*          _frame;
     HiObject*             _ret_value;
 

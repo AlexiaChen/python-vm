@@ -3,6 +3,7 @@
 
 #include "code/binaryFileParser.hpp"
 #include "runtime/universe.hpp"
+#include "object/hiList.hpp"
 
 BinaryFileParser::BinaryFileParser(BufferedInputStream* buf_file_stream) {
     file_stream = buf_file_stream;
@@ -176,6 +177,9 @@ ArrayList<HiObject*>* BinaryFileParser::get_tuple() {
             break;
         case 'R':
             list->add(_string_table.get(file_stream->read_int()));
+            break;
+        case '(':
+            list->add(new HiList(get_tuple()));
             break;
         default:
             printf("parser, unrecognized type : %c\n", obj_type);

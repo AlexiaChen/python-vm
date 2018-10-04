@@ -57,6 +57,9 @@ void Interpreter::initialize() {
     _builtins->put(new HiString("str"),      StringKlass::get_instance()->type_object());
     _builtins->put(new HiString("list"),     ListKlass::get_instance()->type_object());
     _builtins->put(new HiString("dict"),     DictKlass::get_instance()->type_object());
+
+    _modules = new HiDict();
+    _modules->put(new HiString("__builtins__"), _builtins);
 }
 
 void Interpreter::build_frame(HiObject* callable, ObjList args) {
@@ -492,8 +495,24 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::IMPORT_NAME:
+                POP();
+                POP();
                 v = _frame->names()->get(op_arg);
-                PUSH(ModuleObject::import_module(v));
+                w = _modules->get(v);
+                if (w != Universe::HiNone) {
+                    PUSH(w);
+                    break;
+                }
+                w = ModuleObject::import_module(v);
+                _modules->put(v, w);
+                PUSH(w);
+                break;
+
+            case ByteCode::IMPORT_FROM:
+                v = _frame->names()->get(op_arg);
+                w = TOP();
+                u = w->getattr(v);
+                PUSH(u);
                 break;
 
             default:
@@ -504,6 +523,7 @@ void Interpreter::eval_frame() {
 
 void Interpreter::oops_do(OopClosure* f) {
     f->do_oop((HiObject**)&_builtins);
+    f->do_oop((HiObject**)&_modules);
     f->do_oop((HiObject**)&_ret_value);
 
     if (_frame)

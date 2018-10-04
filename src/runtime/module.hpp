@@ -4,6 +4,7 @@
 #include "object/hiObject.hpp"
 
 class HiDict;
+class OopClosure;
 
 class ModuleKlass : public Klass {
 private:
@@ -13,9 +14,13 @@ private:
 public:
     static ModuleKlass* get_instance();
     void initialize();
+
+    virtual void oops_do(OopClosure* closure, HiObject* obj);
+    virtual size_t size();
 };
 
 class ModuleObject : public HiObject {
+friend class ModuleKlass;
 private:
     HiString*   _mod_name;
  
