@@ -131,4 +131,3 @@ template class ArrayList<Block*>;
 class Klass;
 template class ArrayList<Klass*>;
 
-template class ArrayList<char>;

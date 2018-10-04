@@ -322,7 +322,6 @@ void Interpreter::eval_frame() {
                 fo->set_default(args);
 
                 if (args != NULL) {
-                    delete args;
                     args = NULL;
                 }
 
@@ -340,7 +339,6 @@ void Interpreter::eval_frame() {
                 build_frame(POP(), args);
 
                 if (args != NULL) {
-                    delete args;
                     args = NULL;
                 }
                 break;
