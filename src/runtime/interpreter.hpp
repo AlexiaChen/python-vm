@@ -27,7 +27,7 @@ public:
 
     void      run             (CodeObject* codes);
     HiDict*   run_mod         (CodeObject* codes, HiString* mod_name);
-    void      build_frame     (HiObject* callable, ObjList args);
+    void      build_frame     (HiObject* callable, ObjList args, int op_arg);
     void      enter_frame     (FrameObject* frame);
     void      eval_frame      ();
     void      leave_frame     ();

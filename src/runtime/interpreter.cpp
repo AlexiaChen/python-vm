@@ -62,7 +62,7 @@ void Interpreter::initialize() {
     _modules->put(new HiString("__builtins__"), _builtins);
 }
 
-void Interpreter::build_frame(HiObject* callable, ObjList args) {
+void Interpreter::build_frame(HiObject* callable, ObjList args, int op_arg) {
     if (callable->klass() == NativeFunctionKlass::get_instance()) {
         PUSH(((FunctionObject*)callable)->call(args));
     }
@@ -74,10 +74,10 @@ void Interpreter::build_frame(HiObject* callable, ObjList args) {
             args = new ArrayList<HiObject*>(1);
         }
         args->insert(0, method->owner());
-        build_frame(method->func(), args);
+        build_frame(method->func(), args, op_arg);
     }
     else if (callable->klass() == FunctionKlass::get_instance()) {
-        FrameObject* frame = new FrameObject((FunctionObject*) callable, args);
+        FrameObject* frame = new FrameObject((FunctionObject*) callable, args, op_arg);
         frame->set_sender(_frame);
         _frame = frame;
     }
@@ -89,7 +89,7 @@ void Interpreter::build_frame(HiObject* callable, ObjList args) {
     else {
         HiObject* m = callable->getattr(ST(call));
         if (m != Universe::HiNone)
-            build_frame(m, args);
+            build_frame(m, args, op_arg);
         else {
             callable->print();
             printf("\nError : can not call a normal object.\n");
@@ -123,7 +123,7 @@ HiObject* Interpreter::call_virtual(HiObject* func, ObjList args) {
         return call_virtual(method->func(), args);
     }
     else if (MethodObject::is_function(func)) {
-        FrameObject* frame = new FrameObject((FunctionObject*) func, args);
+        FrameObject* frame = new FrameObject((FunctionObject*) func, args, args->size());
         frame->set_entry_frame(true);
         enter_frame(frame);
         eval_frame();
@@ -333,13 +333,16 @@ void Interpreter::eval_frame() {
 
             case ByteCode::CALL_FUNCTION:
                 if (op_arg > 0) {
-                    args = new ArrayList<HiObject*>(op_arg);
-                    while (op_arg--) {
-                        args->set(op_arg, POP());
+                    int na = op_arg & 0xff;
+                    int nk = op_arg >> 8;
+                    int arg_cnt = na + 2 * nk;
+                    args = new ArrayList<HiObject*>(arg_cnt);
+                    while (arg_cnt--) {
+                        args->set(arg_cnt, POP());
                     }
                 }
 
-                build_frame(POP(), args);
+                build_frame(POP(), args, op_arg);
 
                 if (args != NULL) {
                     args = NULL;
@@ -478,7 +481,7 @@ void Interpreter::eval_frame() {
             case ByteCode::FOR_ITER:
                 v = TOP();
                 w = v->getattr(StringTable::get_instance()->next_str);
-                build_frame(w, NULL);
+                build_frame(w, NULL, 0);
 
                 if (TOP() == NULL) {
                     _frame->_pc += op_arg;

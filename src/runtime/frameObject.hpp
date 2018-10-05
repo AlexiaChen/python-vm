@@ -38,7 +38,7 @@ public:
 class FrameObject {
 public:
     FrameObject(CodeObject* codes);
-    FrameObject(FunctionObject* func, ObjList args);
+    FrameObject(FunctionObject* func, ObjList args, int op_arg);
     ~FrameObject() {};
 
     HiList* _stack;

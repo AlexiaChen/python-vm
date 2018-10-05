@@ -23,7 +23,7 @@ FrameObject::FrameObject(CodeObject* codes) {
     _entry_frame = false;
 }
 
-FrameObject::FrameObject (FunctionObject* func, ObjList args) {
+FrameObject::FrameObject (FunctionObject* func, ObjList args, int op_arg) {
     _codes   = func->_func_code;
     _consts  = _codes->_consts;
     _names   = _codes->_names;
@@ -42,8 +42,19 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args) {
     }
 
     if (args) {
-        for (int i = 0; i < args->length(); i++) {
+        int na = op_arg & 0xff;
+        int nk = op_arg >> 8;
+        for (int i = 0; i < na; i++) {
             _fast_locals->set(i, args->get(i));
+        }
+
+        for (int i = 0; i < nk; i++) {
+            HiObject* key = args->get(na + i * 2);
+            int index = _codes->_var_names->index(key);
+
+            if (index >= 0) {
+                _fast_locals->set(index, args->get(na + i * 2 + 1));
+            }
         }
     }
 

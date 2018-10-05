@@ -119,6 +119,22 @@ void ArrayList<HiObject*>::oops_do(OopClosure* closure) {
     }
 }
 
+template <typename T>
+int ArrayList<T>::index(T t) {
+    return 0;
+}
+
+template <>
+int ArrayList<HiObject*>::index(HiObject* t) {
+    for (int i = 0; i < _size; i++) {
+        if (_array[i]->equal(t) == Universe::HiTrue) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 class HiObject;
 template class ArrayList<HiObject*>;
 
