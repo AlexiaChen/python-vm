@@ -18,6 +18,7 @@
 #define POP()         _frame->stack()->pop()
 #define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
+#define PEEK(x)       _frame->stack()->get((x))
 
 #define HI_TRUE       Universe::HiTrue
 #define HI_FALSE      Universe::HiFalse
@@ -178,6 +179,22 @@ void Interpreter::eval_frame() {
                 POP();
                 break;
 
+            case ByteCode::ROT_TWO:
+                v = POP();
+                w = POP();
+                PUSH(v);
+                PUSH(w);
+                break;
+
+            case ByteCode::ROT_THREE:
+                v = POP();
+                w = POP();
+                u = POP();
+                PUSH(v);
+                PUSH(u);
+                PUSH(w);
+                break;
+
             case ByteCode::LOAD_CONST:
                 PUSH(_frame->consts()->get(op_arg));
                 break;
@@ -236,6 +253,19 @@ void Interpreter::eval_frame() {
                 PUSH(_frame->_locals);
                 break;
 
+            case ByteCode::LOAD_CLOSURE:
+                v = _frame->closure()->get(op_arg);
+                if (v != NULL) {
+                    PUSH(v);
+                    break;
+                }
+                PUSH(_frame->get_cell_from_parameter(op_arg));
+                break;
+
+            case ByteCode::LOAD_DEREF:
+                PUSH(_frame->closure()->get(op_arg));
+                break;
+
             case ByteCode::STORE_NAME:
                 v = _frame->names()->get(op_arg);
                 _frame->locals()->put(v, POP());
@@ -269,6 +299,10 @@ void Interpreter::eval_frame() {
                 v = _frame->_names->get(op_arg);
                 w = POP();
                 u->setattr(v, w);
+                break;
+
+            case ByteCode::STORE_DEREF:
+                _frame->closure()->set(op_arg, POP());
                 break;
 
             case ByteCode::BINARY_SUBSCR:
@@ -310,6 +344,26 @@ void Interpreter::eval_frame() {
                 v = POP();
                 w = POP();
                 PUSH(w->mod(v));
+                break;
+
+            case ByteCode::MAKE_CLOSURE:
+                v = POP();
+                fo = new FunctionObject(v);
+                fo->set_closure((HiList*)(POP()));
+                fo->set_globals(_frame->globals());
+                if (op_arg > 0) {
+                    args = new ArrayList<HiObject*>(op_arg);
+                    while (op_arg--) {
+                        args->set(op_arg, POP());
+                    }
+                }
+                fo->set_default(args);
+
+                if (args != NULL) {
+                    args = NULL;
+                }
+
+                PUSH(fo);
                 break;
 
             case ByteCode::MAKE_FUNCTION:
@@ -516,6 +570,39 @@ void Interpreter::eval_frame() {
                 w = TOP();
                 u = w->getattr(v);
                 PUSH(u);
+                break;
+
+            case ByteCode::DUP_TOPX:
+                for (int i = 0; i < op_arg; i++) {
+                    int index = STACK_LEVEL() - op_arg;
+                    PUSH(PEEK(index));
+                }
+                break;
+
+            case ByteCode::CALL_FUNCTION_VAR:
+                v = POP();
+                if (op_arg > 0 || (v && ((HiList*)v)->size() > 0)) {
+                    int na = op_arg & 0xff;
+                    int nk = op_arg >> 8;
+                    int arg_cnt = na + 2 * nk;
+                    args = new ArrayList<HiObject*>();
+                    while (arg_cnt--) {
+                        args->set(arg_cnt, POP());
+                    }
+
+                    int s = ((HiList*)v)->size();
+                    for (int i = 0; i < s; i++) {
+                        args->add(((HiList*)v)->get(i));
+                    }
+                    na += s;
+                    op_arg = (nk << 8) | na;
+                }
+
+                build_frame(POP(), args, op_arg);
+
+                if (args != NULL) {
+                    args = NULL;
+                }
                 break;
 
             default:

@@ -43,6 +43,7 @@ void FunctionKlass::oops_do(OopClosure* f, HiObject* obj) {
     f->do_oop((HiObject**)&fo->_func_code);
     f->do_oop((HiObject**)&fo->_func_name);
     f->do_oop((HiObject**)&fo->_globals);
+    f->do_oop((HiObject**)&fo->_closure);
     f->do_array_list(&fo->_defaults);
 }
 
@@ -53,6 +54,7 @@ FunctionObject::FunctionObject(HiObject* code_object) {
     _func_name = co->_co_name;
     _flags     = co->_flag;
     _globals   = NULL;
+    _closure   = NULL;
 
     set_klass(FunctionKlass::get_instance());
 }
@@ -62,6 +64,7 @@ FunctionObject::FunctionObject(NativeFuncPointer nfp) {
     _func_name = NULL;
     _flags     = 0;
     _globals   = NULL;
+    _closure   = NULL;
     _native_func = nfp;
 
     set_klass(NativeFunctionKlass::get_instance());
@@ -223,6 +226,7 @@ void NativeFunctionKlass::oops_do(OopClosure* f, HiObject* obj) {
     f->do_oop((HiObject**)&fo->_func_code);
     f->do_oop((HiObject**)&fo->_func_name);
     f->do_oop((HiObject**)&fo->_globals);
+    f->do_oop((HiObject**)&fo->_closure);
     f->do_array_list(&fo->_defaults);
 }
 

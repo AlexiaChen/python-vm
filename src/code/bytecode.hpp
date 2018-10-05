@@ -69,6 +69,13 @@ public:
     static const unsigned char CALL_FUNCTION = 131;
     static const unsigned char MAKE_FUNCTION = 132;
 
+    static const unsigned char MAKE_CLOSURE = 134; /* #free vars */
+    static const unsigned char LOAD_CLOSURE = 135; /* Load free variable from closure */
+    static const unsigned char LOAD_DEREF = 136; /* Load and dereference from closure cell */
+    static const unsigned char STORE_DEREF = 137; /* Store into cell */
+
+    static const unsigned char CALL_FUNCTION_VAR = 140;
+
     enum COMPARE {
         LESS = 0,
         LESS_EQUAL,

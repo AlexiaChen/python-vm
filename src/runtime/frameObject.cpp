@@ -13,6 +13,7 @@ FrameObject::FrameObject(CodeObject* codes) {
     _locals  = new HiDict();
     _globals = _locals;
     _fast_locals = NULL;
+    _closure = NULL;
 
     _stack   = new HiList();
     _loop_stack  = new ArrayList<Block*>();
@@ -33,7 +34,6 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args, int op_arg) {
     _locals  = new HiDict();
     _globals = func->_globals;
     _fast_locals = new HiList();
-
     const int argcnt  = _codes->_argcount;
     const int na = op_arg & 0xff;
     const int nk = op_arg >> 8;
@@ -109,6 +109,25 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args, int op_arg) {
         }
     }
 
+    _closure = NULL;
+
+    ArrayList<HiObject*>* cells = _codes->_cell_vars;
+    if (cells && cells->size() > 0) {
+        _closure = new HiList();
+
+        for (int i = 0; i < cells->size(); i++) {
+            _closure->append(NULL);
+        }
+    }
+
+    if (func->closure() && func->closure()->size() > 0) {
+        if (_closure == NULL)
+            _closure = func->closure();
+        else {
+            _closure = (HiList*)_closure->add(func->closure());
+        }
+    }
+
     _stack   = new HiList();
     _loop_stack  = new ArrayList<Block*>();
 
@@ -137,13 +156,19 @@ void FrameObject::oops_do(OopClosure* f) {
 
     f->do_oop((HiObject**)&_globals);
     f->do_oop((HiObject**)&_locals);
-
     f->do_oop((HiObject**)&_fast_locals);
+    f->do_oop((HiObject**)&_closure);
     f->do_oop((HiObject**)&_stack);
 
     f->do_oop((HiObject**)&_codes);
 
     if (_sender)
         _sender->oops_do(f);
+}
+
+HiObject* FrameObject::get_cell_from_parameter(int i) {
+    HiObject* cell_name = _codes->_cell_vars->get(i);
+    i = _codes->_var_names->index(cell_name);
+    return _fast_locals->get(i);
 }
 
