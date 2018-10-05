@@ -24,6 +24,8 @@ FrameObject::FrameObject(CodeObject* codes) {
 }
 
 FrameObject::FrameObject (FunctionObject* func, ObjList args, int op_arg) {
+    assert((args && op_arg != 0) || (args == NULL && op_arg == 0));
+
     _codes   = func->_func_code;
     _consts  = _codes->_consts;
     _names   = _codes->_names;
@@ -32,29 +34,78 @@ FrameObject::FrameObject (FunctionObject* func, ObjList args, int op_arg) {
     _globals = func->_globals;
     _fast_locals = new HiList();
 
-    if (func->_defaults) {
-        int dft_cnt = func->_defaults->length();
-        int argcnt  = _codes->_argcount;
+    const int argcnt  = _codes->_argcount;
+    const int na = op_arg & 0xff;
+    const int nk = op_arg >> 8;
+    int kw_pos = argcnt;
 
-        while (dft_cnt--) {
-            _fast_locals->set(--argcnt, func->_defaults->get(dft_cnt));
+    if (func->_defaults) {
+        int dft_num = func->_defaults->length();
+        int arg_num = _codes->_argcount;
+        while (dft_num--) {
+            _fast_locals->set(--arg_num, func->_defaults->get(dft_num));
         }
     }
 
-    if (args) {
-        int na = op_arg & 0xff;
-        int nk = op_arg >> 8;
+    HiList* alist = NULL;
+    HiDict* adict = NULL;
+
+    if (argcnt < na) {
+        int i = 0;
+        for (; i < argcnt; i++) {
+            _fast_locals->set(i, args->get(i));
+        }
+        alist = new HiList();
+        for (; i < na; i++) {
+            alist->append(args->get(i));
+        }
+    }
+    else {
         for (int i = 0; i < na; i++) {
             _fast_locals->set(i, args->get(i));
         }
+    }
 
-        for (int i = 0; i < nk; i++) {
-            HiObject* key = args->get(na + i * 2);
-            int index = _codes->_var_names->index(key);
+    for (int i = 0; i < nk; i++) {
+        HiObject* key = args->get(na + i * 2);
+        HiObject* val = args->get(na + i * 2 + 1);
 
-            if (index >= 0) {
-                _fast_locals->set(index, args->get(na + i * 2 + 1));
-            }
+        int index = _codes->_var_names->index(key);
+        if (index >= 0) {
+            _fast_locals->set(index, val);
+        }
+        else {
+            if (adict == NULL)
+                adict = new HiDict();
+
+            adict->put(key, val);
+        }
+    }
+
+    if (_codes->_flag & FunctionObject::CO_VARARGS) {
+        if (alist == NULL)
+            alist = new HiList();
+        _fast_locals->set(argcnt, alist);
+        kw_pos += 1;
+    }
+    else {
+        // give more parameters than need.
+        if (alist != NULL) {
+            printf("takes more extend parameters.\n");
+            assert(false);
+        }
+    }
+
+    if (_codes->_flag & FunctionObject::CO_VARKEYWORDS) {
+        if (adict == NULL)
+            adict = new HiDict();
+
+        _fast_locals->set(kw_pos, adict);
+    }
+    else {
+        if (adict != NULL) {
+            printf("takes more extend kw parameters.\n");
+            assert(false);
         }
     }
 
