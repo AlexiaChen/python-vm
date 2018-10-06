@@ -1,29 +1,22 @@
 class A(object):
-    def __init__(self, v):
-        self.value = v
+    def __init__(self):
+        print "In A"
 
-    def __len__(self):
-        return 37
+    def __getattr__(self):
+        return 0
 
-a = A(1)
-b = A(2)
+    def __add__(self, a):
+        return 100
 
-l = []
-l.append(1)
-print l
-print l.append
-a.foo = l.append
-a.foo(1)
-print l
+class B(A):
+    pass
 
-def func(self, s):
-    print self
-    print s
+a = A()
+print (a + a)
 
-a.bar = func
-A.bar = func
+def foo(self, rhs):
+    return 200
 
-a.bar(a, "hello")
-b.bar("world")
-
-print len(a)
+b = B()
+b.__add__ = foo
+print (b + b)

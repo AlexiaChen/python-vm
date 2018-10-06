@@ -76,6 +76,10 @@ HiObject* HiObject::getattr(HiObject* x) {
     return klass()->getattr(this, x);
 }
 
+HiObject* HiObject::get_klass_attr(HiObject* x) {
+    return klass()->get_klass_attr(this, x);
+}
+
 HiObject* HiObject::setattr(HiObject* x, HiObject* y) {
     return klass()->setattr(this, x, y);
     if (klass() == TypeKlass::get_instance()) {
@@ -100,6 +104,10 @@ HiObject* HiObject::contains(HiObject* x) {
 
 HiObject* HiObject::iter() {
     return klass()->iter(this);
+}
+
+HiObject* HiObject::next() {
+    return klass()->next(this);
 }
 
 HiObject* HiObject::len() {

@@ -30,3 +30,8 @@ def func(a, b = 2, *alist, **kwargs):
 print func(1, 2)
 print func(1, c = 3)
 print func(1, 2, 3, c = 4)
+
+def foo(a, b, c = 100, d = 10):
+    return a + b + c + d
+
+print foo(1, 2, d = 2)

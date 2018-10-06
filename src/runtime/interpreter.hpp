@@ -10,11 +10,23 @@ class OopClosure;
 class ModuleObject;
 
 class Interpreter {
+    enum Status {
+        IS_OK,
+        IS_BREAK,
+        IS_EXCEPTION,
+        IS_RERAISE,
+        IS_YIELD,
+    };
+
 private:
     ModuleObject*         _builtins;
     HiDict*               _modules;
     FrameObject*          _frame;
     HiObject*             _ret_value;
+
+    HiObject*             _reraise_exception;
+    HiObject*             _pending_exception;
+    Status                _int_status;
 
     static Interpreter*   _instance;
     Interpreter();

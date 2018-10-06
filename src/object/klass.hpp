@@ -68,11 +68,12 @@ public:
     virtual HiObject* getattr  (HiObject* x, HiObject* y);
     virtual HiObject* setattr  (HiObject* x, HiObject* y, HiObject* z);
 
-    virtual HiObject* call(ArrayList<HiObject*>* args) { return 0; }
-    virtual HiObject* allocate_instance(HiObject* type_object, ArrayList<HiObject*>* args);
-
-    virtual HiObject* iter(HiObject* x) { return 0; }
-    virtual HiObject* len(HiObject* x);
+    virtual HiObject* allocate_instance (HiObject* type_object, ArrayList<HiObject*>* args);
+    virtual HiObject* get_klass_attr    (HiObject* x, HiObject* y);
+    virtual HiObject* next     (HiObject* x);
+    virtual HiObject* iter     (HiObject* x);
+    virtual HiObject* len      (HiObject* x);
+    virtual HiObject* call     (ArrayList<HiObject*>* args) { return 0; }
 
     // gc interfaces
     // this is for objects of this type.

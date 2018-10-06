@@ -41,15 +41,17 @@ public:
     HiObject* ge       (HiObject* x);
     HiObject* le       (HiObject* x);
 
-    HiObject* getattr(HiObject* x);
-    HiObject* setattr(HiObject* x, HiObject* y);
+    HiObject* getattr  (HiObject* x);
+    HiObject* setattr  (HiObject* x, HiObject* y);
 
-    HiObject* subscr(HiObject* x);
-    void      store_subscr(HiObject* x, HiObject* y); 
-    void      del_subscr(HiObject* x); 
-    HiObject* contains(HiObject* x);
+    HiObject* contains (HiObject* x);
+    HiObject* subscr   (HiObject* x);
+    HiObject* get_klass_attr(HiObject* y);
+    void      store_subscr  (HiObject* x, HiObject* y); 
+    void      del_subscr    (HiObject* x); 
 
     HiObject* iter();
+    HiObject* next();
     HiObject* len();
 
     HiDict* obj_dict()   { return _obj_dict; }

@@ -75,7 +75,7 @@ void Interpreter::build_frame(HiObject* callable, ObjList args, int op_arg) {
             args = new ArrayList<HiObject*>(1);
         }
         args->insert(0, method->owner());
-        build_frame(method->func(), args, op_arg);
+        build_frame(method->func(), args, op_arg + 1);
     }
     else if (callable->klass() == FunctionKlass::get_instance()) {
         FrameObject* frame = new FrameObject((FunctionObject*) callable, args, op_arg);
@@ -88,7 +88,7 @@ void Interpreter::build_frame(HiObject* callable, ObjList args, int op_arg) {
         PUSH(inst);
     }
     else {
-        HiObject* m = callable->getattr(ST(call));
+        HiObject* m = callable->get_klass_attr(ST(call));
         if (m != Universe::HiNone)
             build_frame(m, args, op_arg);
         else {
@@ -124,7 +124,8 @@ HiObject* Interpreter::call_virtual(HiObject* func, ObjList args) {
         return call_virtual(method->func(), args);
     }
     else if (MethodObject::is_function(func)) {
-        FrameObject* frame = new FrameObject((FunctionObject*) func, args, args->size());
+        int size = args ? args->size() : 0;
+        FrameObject* frame = new FrameObject((FunctionObject*) func, args, size);
         frame->set_entry_frame(true);
         enter_frame(frame);
         eval_frame();
@@ -193,6 +194,10 @@ void Interpreter::eval_frame() {
                 PUSH(v);
                 PUSH(u);
                 PUSH(w);
+                break;
+
+            case ByteCode::DUP_TOP:
+                PUSH(TOP());
                 break;
 
             case ByteCode::LOAD_CONST:
@@ -534,12 +539,14 @@ void Interpreter::eval_frame() {
 
             case ByteCode::FOR_ITER:
                 v = TOP();
-                w = v->getattr(StringTable::get_instance()->next_str);
-                build_frame(w, NULL, 0);
+                w = v->next();
 
-                if (TOP() == NULL) {
+                if (w == NULL) {
                     _frame->_pc += op_arg;
                     POP();
+                }
+                else {
+                    PUSH(w);
                 }
                 break;
 
@@ -605,6 +612,21 @@ void Interpreter::eval_frame() {
                 }
                 break;
 
+            case ByteCode::RAISE_VARARGS:
+                switch (op_arg) {
+                case 3:
+                    u = POP();
+                case 2:
+                    v = POP();
+                case 1:
+                    w = POP();
+                    break;
+                }
+                _pending_exception = w;
+                _int_status = IS_EXCEPTION;
+
+                break;
+
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
         }
@@ -615,6 +637,8 @@ void Interpreter::oops_do(OopClosure* f) {
     f->do_oop((HiObject**)&_builtins);
     f->do_oop((HiObject**)&_modules);
     f->do_oop((HiObject**)&_ret_value);
+    f->do_oop((HiObject**)&_pending_exception);
+    f->do_oop((HiObject**)&_reraise_exception);
 
     if (_frame)
         _frame->oops_do(f);

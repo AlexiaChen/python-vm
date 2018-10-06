@@ -68,7 +68,7 @@ HiObject* Klass::allocate_instance(HiObject* callable, ArrayList<HiObject*>* arg
         inst = new HiObject();
 
     inst->set_klass(((HiTypeObject*)callable)->own_klass());
-    HiObject* constructor = inst->klass()->klass_dict()->get(ST(init));
+    HiObject* constructor = inst->get_klass_attr(ST(init));
     if (constructor != Universe::HiNone) {
         Interpreter::get_instance()->call_virtual(constructor, args);
     }
@@ -83,7 +83,7 @@ HiObject* Klass::add(HiObject* lhs, HiObject* rhs) {
 }
 
 HiObject* Klass::find_and_call(HiObject* lhs, ObjList args, HiObject* func_name) {
-    HiObject* func = lhs->getattr(func_name);
+    HiObject* func = lhs->get_klass_attr(func_name);
     if (func != Universe::HiNone) {
         return Interpreter::get_instance()->call_virtual(func, args);
     }
@@ -112,6 +112,18 @@ void Klass::store_subscr(HiObject* x, HiObject* y, HiObject* z) {
     find_and_call(x, args, ST(setitem));
 }
 
+HiObject* Klass::get_klass_attr(HiObject* x, HiObject* y) {
+    HiObject* result = Universe::HiNone;
+
+    result = find_in_parents(x, y);
+    if (MethodObject::is_function(result)) {
+        result = new MethodObject((FunctionObject*)result, x);
+    }
+
+    return result;
+}
+
+// This method should only be called in LOAD_ATTR
 HiObject* Klass::getattr(HiObject* x, HiObject* y) {
     HiObject* func = find_in_parents(x, ST(getattr));
     if (func->klass() == FunctionKlass::get_instance()) {
@@ -129,12 +141,7 @@ HiObject* Klass::getattr(HiObject* x, HiObject* y) {
             return result;
     }
 
-    result = find_in_parents(x, y);
-    if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject*)result, x);
-    }
-
-    return result;
+    return get_klass_attr(x, y);
 }
 
 HiObject* Klass::setattr(HiObject* x, HiObject* y, HiObject* z) {
@@ -269,3 +276,10 @@ size_t Klass::size() {
     return sizeof(HiObject);
 }
 
+HiObject* Klass::iter(HiObject* x) {
+    return find_and_call(x, NULL, ST(iter));
+}
+
+HiObject* Klass::next(HiObject* x) {
+    return find_and_call(x, NULL, ST(next));
+}

@@ -23,6 +23,7 @@ public:
     HiString* getattr_str;
     HiString* setattr_str;
     HiString* name_str;
+    HiString* iter_str;
 
     void oops_do(OopClosure* f);
 };

@@ -66,6 +66,7 @@ public:
     static const unsigned char LOAD_FAST  = 124; /* Local variable number */
     static const unsigned char STORE_FAST = 125; /* Local variable number */
 
+    static const unsigned char RAISE_VARARGS = 130;
     static const unsigned char CALL_FUNCTION = 131;
     static const unsigned char MAKE_FUNCTION = 132;
 
