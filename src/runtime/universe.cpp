@@ -12,11 +12,12 @@
 
 HiObject* Universe::HiTrue   = NULL;
 HiObject* Universe::HiFalse  = NULL;
+HiObject* Universe::HiNone   = NULL;
 
-HiObject*  Universe::HiNone   = NULL;
-Heap* Universe::heap          = NULL;
-CodeObject* Universe::main_code = NULL;
+Heap*       Universe::heap   = NULL;
+CodeObject* Universe::main_code        = NULL;
 
+HiObject*   Universe::stop_iteration   = NULL;
 ArrayList<Klass*>* Universe::klasses   = NULL;
 
 void Universe::genesis() {
@@ -26,6 +27,7 @@ void Universe::genesis() {
     HiTrue       = new HiString("True");
     HiFalse      = new HiString("False");
     HiNone       = new HiString("None");
+    stop_iteration = new HiString("stop iteration");
 
     Klass* object_klass = ObjectKlass::get_instance();
     Klass* type_klass   = TypeKlass::get_instance();
@@ -74,6 +76,7 @@ void Universe::oops_do(OopClosure* closure) {
     closure->do_oop((HiObject**)&HiTrue);
     closure->do_oop((HiObject**)&HiFalse);
     closure->do_oop((HiObject**)&HiNone);
+    closure->do_oop((HiObject**)&stop_iteration);
 
     closure->do_oop((HiObject**)&main_code);
     closure->do_array_list(&klasses);

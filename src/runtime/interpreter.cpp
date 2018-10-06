@@ -19,6 +19,7 @@
 #define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
 #define PEEK(x)       _frame->stack()->get((x))
+#define EMPTY()       (_frame->stack()->size() == 0)
 
 #define HI_TRUE       Universe::HiTrue
 #define HI_FALSE      Universe::HiFalse
@@ -38,6 +39,9 @@ Interpreter* Interpreter::get_instance() {
 
 Interpreter::Interpreter() {
     _frame = NULL;
+    _pending_exception = NULL;
+    _reraise_exception = NULL;
+    _int_status = IS_OK;
 }
 
 void Interpreter::initialize() {
@@ -58,6 +62,8 @@ void Interpreter::initialize() {
     _builtins->put(new HiString("str"),      StringKlass::get_instance()->type_object());
     _builtins->put(new HiString("list"),     ListKlass::get_instance()->type_object());
     _builtins->put(new HiString("dict"),     DictKlass::get_instance()->type_object());
+
+    _builtins->put(new HiString("StopIteration"),    Universe::stop_iteration);
 
     _modules = new HiDict();
     _modules->put(new HiString("__builtins__"), _builtins);
@@ -542,8 +548,12 @@ void Interpreter::eval_frame() {
                 w = v->next();
 
                 if (w == NULL) {
+                    // we may encounter a StopIteration, ignore it.
+                    assert(_int_status == IS_EXCEPTION &&
+                            _pending_exception == Universe::stop_iteration);
                     _frame->_pc += op_arg;
-                    POP();
+                    _int_status = IS_OK;
+                    _pending_exception = NULL;
                 }
                 else {
                     PUSH(w);
@@ -629,6 +639,15 @@ void Interpreter::eval_frame() {
 
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
+        }
+
+        // has pending exception and no handler found, unwind stack.
+        if (_int_status == IS_EXCEPTION && _frame->_loop_stack->size() == 0) {
+            _ret_value = NULL;
+            if (_frame->is_first_frame() ||
+                    _frame->is_entry_frame())
+                return;
+            leave_frame();
         }
     }
 }
