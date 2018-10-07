@@ -13,9 +13,9 @@ class Interpreter {
     enum Status {
         IS_OK,
         IS_BREAK,
+        IS_CONTINUE,
         IS_EXCEPTION,
-        IS_RERAISE,
-        IS_YIELD,
+        IS_RETURN,
     };
 
 private:
@@ -24,8 +24,9 @@ private:
     FrameObject*          _frame;
     HiObject*             _ret_value;
 
-    HiObject*             _reraise_exception;
+    HiObject*             _exception_class;
     HiObject*             _pending_exception;
+    HiObject*             _trace_back;
     Status                _int_status;
 
     static Interpreter*   _instance;
@@ -44,6 +45,7 @@ public:
     void      eval_frame      ();
     void      leave_frame     ();
     HiObject* call_virtual    (HiObject* func, ObjList args);
+    Status    do_raise        (HiObject* exc, HiObject* val, HiObject* tb);
 
     void      oops_do         (OopClosure* f);
 };

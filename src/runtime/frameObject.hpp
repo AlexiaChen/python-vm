@@ -76,6 +76,10 @@ public:
     HiList* closure()               { return _closure; }
     HiObject* get_cell_from_parameter(int i );
 
+    HiString* file_name();
+    HiString* func_name();
+    int lineno();
+
     bool has_more_codes();
     unsigned char get_op_code();
     int  get_op_arg();

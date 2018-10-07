@@ -179,6 +179,9 @@ HiObject* isinstance(ObjList args) {
     assert(y && y->klass() == TypeKlass::get_instance());
 
     Klass* k = x->klass();
+    if (k->type_object() == y)
+        return Universe::HiTrue;
+
     for (int i = 0; i < k->mro()->size(); i++) {
         if (k->mro()->get(i) == y) {
             return Universe::HiTrue;

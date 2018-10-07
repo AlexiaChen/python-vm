@@ -24,6 +24,7 @@ public:
     HiString* setattr_str;
     HiString* name_str;
     HiString* iter_str;
+    HiString* repr_str;
 
     void oops_do(OopClosure* f);
 };

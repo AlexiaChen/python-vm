@@ -48,6 +48,10 @@ HiObject* ModuleObject::get(HiObject* x) {
     return obj_dict()->get(x);
 }
 
+void ModuleObject::extend(ModuleObject* mo) {
+    obj_dict()->update(mo->obj_dict());
+}
+
 size_t ModuleKlass::size() {
     return sizeof(ModuleObject);
 }

@@ -28,8 +28,9 @@ public:
     ModuleObject(HiDict* x);
     static ModuleObject* import_module(HiObject* mod_name);
 
-    void put(HiObject* x, HiObject* y);
-    HiObject* get(HiObject* x);
+    void      put       (HiObject* x, HiObject* y);
+    HiObject* get       (HiObject* x);
+    void      extend    (ModuleObject* mo);
 };
 
 #endif

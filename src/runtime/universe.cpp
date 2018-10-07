@@ -27,7 +27,6 @@ void Universe::genesis() {
     HiTrue       = new HiString("True");
     HiFalse      = new HiString("False");
     HiNone       = new HiString("None");
-    stop_iteration = new HiString("stop iteration");
 
     Klass* object_klass = ObjectKlass::get_instance();
     Klass* type_klass   = TypeKlass::get_instance();

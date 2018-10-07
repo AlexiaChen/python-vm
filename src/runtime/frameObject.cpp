@@ -172,3 +172,15 @@ HiObject* FrameObject::get_cell_from_parameter(int i) {
     return _fast_locals->get(i);
 }
 
+HiString* FrameObject::file_name() {
+    return _codes->_file_name;
+}
+
+HiString* FrameObject::func_name() {
+    return _codes->_co_name;
+}
+
+int FrameObject::lineno() {
+    return _pc;
+}
+
