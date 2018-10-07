@@ -92,7 +92,7 @@ HiString::HiString(const char * x, const int length) {
 
 HiString::HiString(const int length) {
     _length = length;
-    _value = (char*)Universe::heap->allocate(_length);
+    _value = (char*)Universe::heap->allocate(_length + 1);
     set_klass(StringKlass::get_instance());
 }
 
@@ -146,7 +146,7 @@ HiObject* StringKlass::add(HiObject* x, HiObject* y) {
     HiString* sx = (HiString*)x;
     HiString* sy = (HiString*)y;
 
-    HiString* sz = new HiString(sx->length() + sy->length() + 1);
+    HiString* sz = new HiString(sx->length() + sy->length());
 
     int i, j;
     for (i = 0; i < sx->length(); i++) {

@@ -27,6 +27,7 @@ private:
 public:
     ModuleObject(HiDict* x);
     static ModuleObject* import_module(HiObject* mod_name);
+    static ModuleObject* import_so    (HiString* mod_name);
 
     void      put       (HiObject* x, HiObject* y);
     HiObject* get       (HiObject* x);

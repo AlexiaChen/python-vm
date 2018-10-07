@@ -66,7 +66,7 @@ Interpreter::Interpreter() {
 }
 
 void Interpreter::initialize() {
-    _builtins->extend(ModuleObject::import_module(new HiString("lib/builtin")));
+    _builtins->extend(ModuleObject::import_module(new HiString("builtin")));
     Universe::stop_iteration = _builtins->get(new HiString("StopIteration"));
 
     _modules = new HiDict();
@@ -433,12 +433,6 @@ void Interpreter::eval_frame() {
 
             case ByteCode::RETURN_VALUE:
                 _ret_value = POP();
-                /*
-                if (_frame->is_first_frame() ||
-                        _frame->is_entry_frame())
-                    return;
-                leave_frame();
-                */
                 _int_status = IS_RETURN;
                 break;
 

@@ -36,12 +36,15 @@ private:
 public:
     HiDict();
     HiDict(Map<HiObject*, HiObject*>* map);
+
     Map<HiObject*, HiObject*>* map()   { return _map; }
     void put(HiObject* k, HiObject* v) { _map->put(k, v); }
     HiObject* get(HiObject* k)         { return _map->get(k); }
-    bool has_key(HiObject* k)          { return _map->has_key(k); }
-    int  size()                        { return _map->size(); }
+    bool      has_key(HiObject* k)     { return _map->has_key(k); }
+    int       size()                   { return _map->size(); }
     HiObject* remove(HiObject* k)      { return _map->remove(k); }
+
+    void      update(HiDict* d);
 };
 
 HiObject* dict_set_default(ObjList args);
