@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 
 PROJECT(RAILGUN)
 
-SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb ")
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
+SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb -rdynamic")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -rdynamic")
 
 ADD_EXECUTABLE(railgun main.cpp
     object/hiInteger.cpp
+    object/hiDouble.cpp
     object/hiString.cpp
     object/hiObject.cpp
     object/hiList.cpp
@@ -21,9 +22,22 @@ ADD_EXECUTABLE(railgun main.cpp
     runtime/functionObject.cpp
     runtime/stringTable.cpp
     runtime/module.cpp
+    runtime/traceback.cpp
     memory/heap.cpp
     memory/oopClosure.cpp
     code/binaryFileParser.cpp
     code/codeObject.cpp)
+
+ADD_LIBRARY(math SHARED
+    extlib/math.cpp)
+
+ADD_CUSTOM_COMMAND(TARGET math
+    POST_BUILD
+    COMMAND mkdir -p lib
+    COMMAND cp libmath.so lib/
+    COMMAND cp ../lib/*.py lib/
+    COMMAND python -m compileall lib/*.py
+    )
     
 INCLUDE_DIRECTORIES(./)
+TARGET_LINK_LIBRARIES(railgun ${CMAKE_DL_LIBS})

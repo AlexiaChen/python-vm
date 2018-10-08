@@ -23,6 +23,8 @@ public:
 
     static CodeObject* main_code;
     static Heap* heap;
+
+    static HiObject* stop_iteration;
 public:
     static void genesis();
     static void destroy();

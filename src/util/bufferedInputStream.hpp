@@ -41,6 +41,15 @@ public:
         return b4 << 24 | b3 << 16 | b2 << 8 | b1;
     }
 
+    double read_double() {
+        char t[8];
+        for (int i = 0; i < 8; i++) {
+            t[i] = read();
+        }
+
+        return *(double *)t;
+    }
+
     void unread() {
         index--;
     }

@@ -20,8 +20,6 @@ public:
     virtual void oops_do(OopClosure* f, HiObject* obj);
 };
 
-HiObject* string_upper(ObjList args);
-
 typedef HiObject* (*NativeFuncPointer)(ObjList args);
 
 class FunctionObject : public HiObject {

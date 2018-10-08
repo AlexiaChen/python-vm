@@ -4,6 +4,7 @@
 #include "runtime/functionObject.hpp"
 #include "runtime/stringTable.hpp"
 #include "runtime/module.hpp"
+#include "runtime/traceback.hpp"
 #include "util/arrayList.hpp"
 #include "util/map.hpp"
 #include "object/hiString.hpp"
@@ -19,6 +20,7 @@
 #define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
 #define PEEK(x)       _frame->stack()->get((x))
+#define EMPTY()       (_frame->stack()->size() == 0)
 
 #define HI_TRUE       Universe::HiTrue
 #define HI_FALSE      Universe::HiFalse
@@ -38,11 +40,14 @@ Interpreter* Interpreter::get_instance() {
 
 Interpreter::Interpreter() {
     _frame = NULL;
-}
+    _exception_class = NULL;
+    _pending_exception = NULL;
+    _trace_back = NULL;
+    _int_status = IS_OK;
 
-void Interpreter::initialize() {
-    _builtins = ModuleObject::import_module(new HiString("lib/builtin"));
-
+    // prepare for import builtin, this should be created first
+    _builtins = new ModuleObject(new HiDict());
+    _builtins->put(new HiString("object"),   ObjectKlass::get_instance()->type_object());
     _builtins->put(new HiString("True"),     Universe::HiTrue);
     _builtins->put(new HiString("False"),    Universe::HiFalse);
     _builtins->put(new HiString("None"),     Universe::HiNone);
@@ -58,6 +63,11 @@ void Interpreter::initialize() {
     _builtins->put(new HiString("str"),      StringKlass::get_instance()->type_object());
     _builtins->put(new HiString("list"),     ListKlass::get_instance()->type_object());
     _builtins->put(new HiString("dict"),     DictKlass::get_instance()->type_object());
+}
+
+void Interpreter::initialize() {
+    _builtins->extend(ModuleObject::import_module(new HiString("builtin")));
+    Universe::stop_iteration = _builtins->get(new HiString("StopIteration"));
 
     _modules = new HiDict();
     _modules->put(new HiString("__builtins__"), _builtins);
@@ -145,6 +155,19 @@ void Interpreter::run(CodeObject* codes) {
     _frame = new FrameObject(codes);
     _frame->locals()->put(ST(name), new HiString("__main__"));
     eval_frame();
+
+    if (_int_status == IS_EXCEPTION) {
+        _int_status = IS_OK;
+
+        _trace_back->print();
+        _pending_exception->print();
+        printf("\n");
+
+        _trace_back = NULL;
+        _pending_exception = NULL;
+        _exception_class = NULL;
+    }
+
     destroy_frame();
 }
 
@@ -325,6 +348,13 @@ void Interpreter::eval_frame() {
                 printf("\n");
                 break;
 
+            case ByteCode::INPLACE_DIVIDE:
+            case ByteCode::BINARY_DIVIDE:
+                v = POP();
+                w = POP();
+                PUSH(w->div(v));
+                break;
+
             case ByteCode::INPLACE_ADD:
             case ByteCode::BINARY_ADD:
                 v = POP();
@@ -410,10 +440,7 @@ void Interpreter::eval_frame() {
 
             case ByteCode::RETURN_VALUE:
                 _ret_value = POP();
-                if (_frame->is_first_frame() ||
-                        _frame->is_entry_frame())
-                    return;
-                leave_frame();
+                _int_status = IS_RETURN;
                 break;
 
             case ByteCode::COMPARE_OP:
@@ -463,6 +490,13 @@ void Interpreter::eval_frame() {
                         PUSH(HI_FALSE);
                     break;
 
+                case ByteCode::EXC_MATCH:
+                    if (v == w)
+                        PUSH(Universe::HiTrue);
+                    else
+                        PUSH(Universe::HiFalse);
+                    break;
+
                 default:
                     printf("Error: Unrecognized compare op %d\n", op_arg);
 
@@ -489,6 +523,8 @@ void Interpreter::eval_frame() {
                 _frame->set_pc(op_arg);
                 break;
 
+            case ByteCode::SETUP_FINALLY:
+            case ByteCode::SETUP_EXCEPT:
             case ByteCode::SETUP_LOOP:
                 _frame->loop_stack()->add(new Block(
                     op_code, _frame->get_pc() + op_arg,
@@ -503,11 +539,30 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::BREAK_LOOP:
-                b = _frame->loop_stack()->pop();
-                while (STACK_LEVEL() > b->_level) {
-                    POP();
+                _int_status = IS_BREAK;
+                break;
+
+            case ByteCode::CONTINUE_LOOP:
+                _int_status = IS_CONTINUE;
+                _ret_value = (HiObject*)((long)op_arg);
+                break;
+
+            case ByteCode::END_FINALLY:
+                // TODO: restore exceptions
+                v = POP();
+                if (((long)v) & 0x1) {
+                    _int_status = (Status)(((long)v) >> 1);
+                    if (_int_status == IS_RETURN)
+                        _ret_value = POP();
+                    else if (_int_status == IS_CONTINUE)
+                        _frame->_pc = (int)((long)(POP()));
                 }
-                _frame->set_pc(b->_target);
+                else if (v != Universe::HiNone) {
+                    _exception_class = v;
+                    _pending_exception = POP();
+                    _trace_back = POP();
+                    _int_status = IS_EXCEPTION;
+                }
                 break;
 
             case ByteCode::BUILD_TUPLE: // drop down, we need this
@@ -542,8 +597,11 @@ void Interpreter::eval_frame() {
                 w = v->next();
 
                 if (w == NULL) {
+                    // we may encounter a StopIteration, ignore it.
+                    //assert(_int_status == IS_EXCEPTION && _pending_exception != NULL);
                     _frame->_pc += op_arg;
-                    POP();
+                    _int_status = IS_OK;
+                    _pending_exception = NULL;
                 }
                 else {
                     PUSH(w);
@@ -613,6 +671,7 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::RAISE_VARARGS:
+                w = v = u = NULL;
                 switch (op_arg) {
                 case 3:
                     u = POP();
@@ -622,13 +681,70 @@ void Interpreter::eval_frame() {
                     w = POP();
                     break;
                 }
-                _pending_exception = w;
-                _int_status = IS_EXCEPTION;
+                do_raise(w, v, u);
 
                 break;
 
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
+        }
+
+        while (_int_status != IS_OK && _frame->_loop_stack->size() != 0) {
+            b = _frame->_loop_stack->get(_frame->_loop_stack->size()-1);
+            if (_int_status == IS_CONTINUE && b->_type == ByteCode::SETUP_LOOP) {
+                _frame->_pc = (int)((long)_ret_value);
+                _int_status = IS_OK;
+                break;
+            }
+
+            b = _frame->_loop_stack->pop();
+            while (STACK_LEVEL() > b->_level) {
+                POP();
+            }
+
+            if (_int_status == IS_BREAK && b->_type == ByteCode::SETUP_LOOP) {
+                _frame->_pc = b->_target;;
+                _int_status = IS_OK;
+            }
+            else if (b->_type == ByteCode::SETUP_FINALLY || 
+                    (_int_status == IS_EXCEPTION
+                    && b->_type == ByteCode::SETUP_EXCEPT)) {
+                if (_int_status == IS_EXCEPTION) {
+                    // traceback, value, exception class
+                    PUSH(_trace_back);
+                    PUSH(_pending_exception);
+                    PUSH(_exception_class);
+
+                    _trace_back = NULL;
+                    _pending_exception = NULL;
+                    _exception_class = NULL;
+                }
+                else {
+                    if (_int_status == IS_RETURN ||
+                            _int_status == IS_CONTINUE)
+                        PUSH(_ret_value);
+
+                    PUSH((HiObject*)(((long)_int_status << 1) | 0x1));
+                }
+                _frame->_pc = b->_target;;
+                _int_status = IS_OK;
+            }
+        }
+
+        // has pending exception and no handler found, unwind stack.
+        if (_int_status != IS_OK && _frame->_loop_stack->size() == 0) {
+            if (_int_status == IS_EXCEPTION) {
+                _ret_value = NULL;
+                ((Traceback*)_trace_back)->record_frame(_frame);
+            }
+
+            if (_int_status == IS_RETURN)
+                _int_status = IS_OK;
+
+            if (_frame->is_first_frame() ||
+                    _frame->is_entry_frame())
+                return;
+            leave_frame();
         }
     }
 }
@@ -637,10 +753,39 @@ void Interpreter::oops_do(OopClosure* f) {
     f->do_oop((HiObject**)&_builtins);
     f->do_oop((HiObject**)&_modules);
     f->do_oop((HiObject**)&_ret_value);
+    f->do_oop((HiObject**)&_exception_class);
     f->do_oop((HiObject**)&_pending_exception);
-    f->do_oop((HiObject**)&_reraise_exception);
+    f->do_oop((HiObject**)&_trace_back);
 
     if (_frame)
         _frame->oops_do(f);
+}
+
+Interpreter::Status Interpreter::do_raise(HiObject* exc, HiObject* val, HiObject* tb) {
+    assert(exc != NULL);
+
+    _int_status = IS_EXCEPTION;
+
+    if (tb == NULL) {
+        tb = new Traceback();
+    }
+
+    if (val != NULL) {
+        _exception_class = exc;
+        _pending_exception = val;
+        _trace_back = tb;
+        return IS_EXCEPTION;
+    }
+
+    if (exc->klass() == TypeKlass::get_instance()) {
+        _pending_exception = call_virtual(_pending_exception, NULL);
+        _exception_class = exc;
+    }
+    else {
+        _pending_exception = exc;
+        _exception_class = _pending_exception->klass()->type_object();
+    }
+    _trace_back = tb;
+    return IS_EXCEPTION;
 }
 

@@ -28,6 +28,7 @@ public:
 };
 
 class HiString : public HiObject {
+friend class StringKlass;
 private:
     char* _value;
     int   _length;
@@ -41,6 +42,11 @@ public:
     char** value_address()  { return &_value; }
     int length()            { return _length; }
     void set(int i, char x) { _value[i] = x; }
+
+    HiString* join(HiObject* iterable);
 };
+
+HiObject* string_upper(ObjList args);
+HiObject* string_join(ObjList args);
 
 #endif

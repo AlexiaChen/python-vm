@@ -34,6 +34,7 @@ public:
     static const unsigned char LOAD_LOCALS = 82;
     static const unsigned char RETURN_VALUE = 83;
     static const unsigned char POP_BLOCK = 87;
+    static const unsigned char END_FINALLY = 88;
     static const unsigned char BUILD_CLASS = 89;
 
     // TODO: This is a separator
@@ -62,7 +63,12 @@ public:
     static const unsigned char POP_JUMP_IF_FALSE = 114;
     static const unsigned char POP_JUMP_IF_TRUE = 115;
     static const unsigned char LOAD_GLOBAL = 116; /* Index in name list */
+
+    static const unsigned char CONTINUE_LOOP = 119; /* Start of loop (absolute) */
     static const unsigned char SETUP_LOOP = 120; /* Target address (relative) */
+    static const unsigned char SETUP_EXCEPT = 121;  /* "" */
+    static const unsigned char SETUP_FINALLY = 122; /* "" */
+
     static const unsigned char LOAD_FAST  = 124; /* Local variable number */
     static const unsigned char STORE_FAST = 125; /* Local variable number */
 

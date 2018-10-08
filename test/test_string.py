@@ -1,2 +1,11 @@
-s = "hello"
-print s[0]
+a = "hello"
+b = "world"
+l = []
+l.append(a)
+print ", ".join(l);
+l.append(b)
+print ", ".join(l);
+l.append(a)
+print ", ".join(l);
+l.append(b)
+print ", ".join(l);

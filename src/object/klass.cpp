@@ -30,6 +30,15 @@ int Klass::compare_klass(Klass* x, Klass* y) {
 }
 
 void Klass::print(HiObject* x) {
+    HiObject* meth_repr = get_klass_attr(x, ST(repr));
+    if (meth_repr != Universe::HiNone) {
+        Interpreter::get_instance()->
+            call_virtual(meth_repr, NULL)->
+            print();
+
+        return;
+    }
+
     printf("<object of ");
     x->klass()->name()->print();
     printf(", at %p>", x);

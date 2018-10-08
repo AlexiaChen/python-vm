@@ -3,6 +3,7 @@
 #include "runtime/module.hpp"
 #include "runtime/interpreter.hpp"
 #include "object/hiInteger.hpp"
+#include "object/hiDouble.hpp"
 #include "object/hiObject.hpp"
 #include "object/hiString.hpp"
 #include "object/hiList.hpp"
@@ -12,11 +13,12 @@
 
 HiObject* Universe::HiTrue   = NULL;
 HiObject* Universe::HiFalse  = NULL;
+HiObject* Universe::HiNone   = NULL;
 
-HiObject*  Universe::HiNone   = NULL;
-Heap* Universe::heap          = NULL;
-CodeObject* Universe::main_code = NULL;
+Heap*       Universe::heap   = NULL;
+CodeObject* Universe::main_code        = NULL;
 
+HiObject*   Universe::stop_iteration   = NULL;
 ArrayList<Klass*>* Universe::klasses   = NULL;
 
 void Universe::genesis() {
@@ -41,6 +43,7 @@ void Universe::genesis() {
     //object_klass->add_super(NULL);
 
     IntegerKlass::get_instance()->initialize();
+    DoubleKlass::get_instance()->initialize();
     StringKlass::get_instance()->initialize();
     DictKlass::get_instance()->initialize();
     ListKlass::get_instance()->initialize();
@@ -53,6 +56,7 @@ void Universe::genesis() {
     object_klass->set_name(new HiString("object"));
 
     IntegerKlass::get_instance()->order_supers();
+    DoubleKlass::get_instance()->order_supers();
     StringKlass::get_instance()->order_supers();
     DictKlass::get_instance()->order_supers();
     ListKlass::get_instance()->order_supers();
@@ -74,6 +78,7 @@ void Universe::oops_do(OopClosure* closure) {
     closure->do_oop((HiObject**)&HiTrue);
     closure->do_oop((HiObject**)&HiFalse);
     closure->do_oop((HiObject**)&HiNone);
+    closure->do_oop((HiObject**)&stop_iteration);
 
     closure->do_oop((HiObject**)&main_code);
     closure->do_array_list(&klasses);
