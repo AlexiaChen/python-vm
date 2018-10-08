@@ -4,6 +4,7 @@
 #include "code/binaryFileParser.hpp"
 #include "runtime/universe.hpp"
 #include "object/hiList.hpp"
+#include "object/hiDouble.hpp"
 
 BinaryFileParser::BinaryFileParser(BufferedInputStream* buf_file_stream) {
     file_stream = buf_file_stream;
@@ -163,6 +164,9 @@ ArrayList<HiObject*>* BinaryFileParser::get_tuple() {
             break;
         case 'i':
             list->add(new HiInteger(file_stream->read_int()));
+            break;
+        case 'g':
+            list->add(new HiDouble(file_stream->read_double()));
             break;
         case 'N':
             list->add(Universe::HiNone);

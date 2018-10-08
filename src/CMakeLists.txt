@@ -7,6 +7,7 @@ SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -rdynamic")
 
 ADD_EXECUTABLE(railgun main.cpp
     object/hiInteger.cpp
+    object/hiDouble.cpp
     object/hiString.cpp
     object/hiObject.cpp
     object/hiList.cpp
@@ -31,6 +32,7 @@ ADD_LIBRARY(math SHARED
     extlib/math.cpp)
 
 ADD_CUSTOM_COMMAND(TARGET math
+    POST_BUILD
     COMMAND mkdir -p lib
     COMMAND cp libmath.so lib/
     COMMAND cp ../lib/*.py lib/

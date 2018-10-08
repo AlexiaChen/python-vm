@@ -348,6 +348,13 @@ void Interpreter::eval_frame() {
                 printf("\n");
                 break;
 
+            case ByteCode::INPLACE_DIVIDE:
+            case ByteCode::BINARY_DIVIDE:
+                v = POP();
+                w = POP();
+                PUSH(w->div(v));
+                break;
+
             case ByteCode::INPLACE_ADD:
             case ByteCode::BINARY_ADD:
                 v = POP();

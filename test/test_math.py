@@ -1,3 +1,6 @@
 import math
 
-print math.add(3, 5)
+print math.pi
+print math.e
+print math.sin(math.pi / 3.0)
+print math.sqrt(200)

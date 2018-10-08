@@ -3,6 +3,7 @@
 
 #include "runtime/functionObject.hpp"
 #include "object/hiInteger.hpp"
+#include "object/hiDouble.hpp"
 
 #define SO_PUBLIC __attribute__((visibility("default")))
 

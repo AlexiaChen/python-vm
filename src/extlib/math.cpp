@@ -1,14 +1,32 @@
 #include "inc/railgun.hpp"
 
-HiObject* add(ObjList args) {
-    HiInteger* a = (HiInteger*)(args->get(0));
-    HiInteger* b = (HiInteger*)(args->get(1));
+#include <math.h>
 
-    return new HiInteger(a->value() + b->value());
+double get_double(ObjList args) {
+    HiObject* x = args->get(0);
+    double y = 0;
+    if (x->klass() == IntegerKlass::get_instance()) {
+        y = ((HiInteger*)x)->value();
+    }
+    else if (x->klass() == DoubleKlass::get_instance()) {
+        y = ((HiDouble*)x)->value();
+    }
+    return y;
+}
+
+HiObject* math_sqrt(ObjList args) {
+    double x = get_double(args);
+    return new HiDouble(sqrt(x));
+}
+
+HiObject* math_sin(ObjList args) {
+    double x = get_double(args);
+    return new HiDouble(sin(x));
 }
 
 RGMethod math_methods[] = {
-    { "add", add, 0, "add tow integer", },
+    { "sin",  math_sin,  0, "sin(x)", },
+    { "sqrt", math_sqrt, 0, "square root of x", },
     { NULL, NULL, 0, NULL, },
 };
 
