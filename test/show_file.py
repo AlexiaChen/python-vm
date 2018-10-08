@@ -4,8 +4,9 @@ def show_file(fname):
     f = open(fname, "rb")
     magic = f.read(4)
     moddate = f.read(4)
+    #modtime = time.asctime(time.localtime(struct.unpack('L', moddate)[0]))
     print "magic %s" % (magic.encode('hex'))
-    print "moddate %s" % (moddate.encode('hex'))
+    #print "moddate %s (%s)" % (moddate.encode('hex'), modtime)
     code = marshal.load(f)
     show_code(code)
      

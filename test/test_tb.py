@@ -3,6 +3,6 @@ def foo(a):
     bar(a, b)
 
 def bar(a, b):
-    return a / b
+    raise Exception("something wrong!")
 
 foo(1)

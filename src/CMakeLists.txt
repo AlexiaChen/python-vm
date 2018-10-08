@@ -29,6 +29,13 @@ ADD_EXECUTABLE(railgun main.cpp
 
 ADD_LIBRARY(math SHARED
     extlib/math.cpp)
+
+ADD_CUSTOM_COMMAND(TARGET math
+    COMMAND mkdir -p lib
+    COMMAND cp libmath.so lib/
+    COMMAND cp ../lib/*.py lib/
+    COMMAND python -m compileall lib/*.py
+    )
     
 INCLUDE_DIRECTORIES(./)
 TARGET_LINK_LIBRARIES(railgun ${CMAKE_DL_LIBS})

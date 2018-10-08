@@ -1,7 +1,9 @@
 #include "object/hiDict.hpp"
+#include "object/hiList.hpp"
 #include "runtime/module.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/interpreter.hpp"
+#include "runtime/stringTable.hpp"
 #include "util/bufferedInputStream.hpp"
 #include "code/binaryFileParser.hpp"
 #include "memory/oopClosure.hpp"
@@ -9,6 +11,9 @@
 
 #include <dlfcn.h>
 #include <unistd.h>
+
+#define ST(x) StringTable::get_instance()->STR(x)
+#define STR(x) x##_str
 
 ModuleKlass* ModuleKlass::_instance = NULL;
 
@@ -38,18 +43,23 @@ ModuleObject::ModuleObject(HiDict* dict) {
 ModuleObject* ModuleObject::import_module(HiObject* x) {
     HiString* mod_name = (HiString*)x;
 
-    HiString* prefix = new HiString("./lib/");
-    HiString* pyc_suffix = new HiString(".pyc");
-    HiString* so_suffix = new HiString(".so");
+    HiList* so_list = new HiList();
+    so_list->append(ST(libdir_pre));
+    so_list->append(mod_name);
+    so_list->append(ST(so_suf));
+    HiString* file_name = ST(empty)->join(so_list);
      
-    HiString* file_name = (HiString*)(prefix->add(mod_name)->add(so_suffix));
     if (access(file_name->value(), R_OK) == 0) {
         return import_so(mod_name);
     }
 
-    file_name = (HiString*)(mod_name->add(pyc_suffix));
+    file_name = (HiString*)(mod_name->add(ST(pyc_suf)));
     if (access(file_name->value(), R_OK) == -1) {
-        file_name = (HiString*)(prefix->add(mod_name)->add(pyc_suffix));
+        HiList* pyc_list = new HiList();
+        pyc_list->append(ST(libdir_pre));
+        pyc_list->append(mod_name);
+        pyc_list->append(ST(pyc_suf));
+        file_name = ST(empty)->join(pyc_list);
     }
 
     assert(access(file_name->value(), R_OK) == 0);

@@ -26,6 +26,12 @@ public:
     HiString* iter_str;
     HiString* repr_str;
 
+    HiString* libdir_pre_str;
+    HiString* empty_str;
+    HiString* so_pre_str;
+    HiString* so_suf_str;
+    HiString* pyc_suf_str;
+
     void oops_do(OopClosure* f);
 };
 

@@ -24,6 +24,7 @@ void StringKlass::initialize() {
 
     HiDict* klass_dict = new HiDict();
     klass_dict->put(new HiString("upper"), new FunctionObject(string_upper));
+    klass_dict->put(new HiString("join"), new FunctionObject(string_join));
     set_klass_dict(klass_dict);
 
     set_name(new HiString("str"));
@@ -148,16 +149,12 @@ HiObject* StringKlass::add(HiObject* x, HiObject* y) {
 
     HiString* sz = new HiString(sx->length() + sy->length());
 
-    int i, j;
-    for (i = 0; i < sx->length(); i++) {
-        sz->set(i, sx->value()[i]);
-    }
+    memcpy(sz->_value, sx->_value, sx->length());
+    memcpy(sz->_value + sx->length(), 
+            sy->_value, 
+            sy->length());
 
-    for (j = 0; j < sy->length(); j++) {
-        sz->set(sx->length() + j, sy->value()[j]);
-    }
-
-    sz->set(i + j, '\0');
+    sz->set(sx->length() + sy->length(), '\0');
 
     return sz;
 }
@@ -171,5 +168,45 @@ void StringKlass::oops_do(OopClosure* closure, HiObject* obj) {
 
 size_t StringKlass::size() {
     return sizeof(HiString);
+}
+
+HiString* HiString::join(HiObject* iterable) {
+    int total = 0;
+
+    HiObject* iter = iterable->iter();
+    HiObject* str = iter->next();
+
+    if (str == NULL)
+        return new HiString("");
+
+    total += ((HiString*)str)->length();
+    while ((str = iter->next()) != NULL) {
+        total += _length;
+        total += ((HiString*)str)->length();
+    }
+
+    HiString* sz = new HiString(total);
+    total = 0;
+
+    iter = iterable->iter();
+    str = iter->next();
+    HiString* sobj = (HiString*)str;
+
+    memcpy(sz->_value, sobj->_value, sobj->length());
+    total += ((HiString*)str)->length();
+    while ((str = iter->next()) != NULL) {
+        HiString* sobj = (HiString*)str;
+        memcpy(sz->_value + total, _value, _length);
+        total += _length;
+        memcpy(sz->_value + total, sobj->_value, sobj->length());
+        total += sobj->_length;
+    }
+
+    return sz;
+}
+
+HiObject* string_join(ObjList args) {
+    HiString* arg0 = (HiString*)(args->get(0));
+    return arg0->join(args->get(1));
 }
 
