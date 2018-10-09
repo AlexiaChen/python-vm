@@ -47,3 +47,14 @@ def range(*args):
         print "Error"
 
     return lst
+
+class Exception(object):
+    def __init__(self, *args):
+        self.info = args
+
+    def __repr__(self):
+        return " ".join(self.info)
+
+class StopIteration(Exception):
+    pass
+
