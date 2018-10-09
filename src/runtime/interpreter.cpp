@@ -633,7 +633,7 @@ void Interpreter::eval_frame() {
             case ByteCode::IMPORT_FROM:
                 v = _frame->names()->get(op_arg);
                 w = TOP();
-                u = w->getattr(v);
+                u = ((ModuleObject*)w)->get(v);
                 PUSH(u);
                 break;
 
