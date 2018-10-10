@@ -33,6 +33,7 @@ public:
     static const unsigned char BREAK_LOOP = 80;
     static const unsigned char LOAD_LOCALS = 82;
     static const unsigned char RETURN_VALUE = 83;
+    static const unsigned char YIELD_VALUE = 86;
     static const unsigned char POP_BLOCK = 87;
     static const unsigned char END_FINALLY = 88;
     static const unsigned char BUILD_CLASS = 89;

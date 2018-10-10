@@ -5,8 +5,10 @@
 #include "runtime/stringTable.hpp"
 #include "runtime/module.hpp"
 #include "runtime/traceback.hpp"
+#include "runtime/generator.hpp"
 #include "util/arrayList.hpp"
 #include "util/map.hpp"
+#include "util/handles.hpp"
 #include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiList.hpp"
@@ -86,6 +88,11 @@ void Interpreter::build_frame(HiObject* callable, ObjList args, int op_arg) {
         }
         args->insert(0, method->owner());
         build_frame(method->func(), args, op_arg + 1);
+    }
+    else if (MethodObject::is_yield_function(callable)) {
+        Generator* gtor = new Generator((FunctionObject*) callable, args, op_arg);
+        PUSH(gtor);
+        return;
     }
     else if (callable->klass() == FunctionKlass::get_instance()) {
         FrameObject* frame = new FrameObject((FunctionObject*) callable, args, op_arg);
@@ -685,6 +692,13 @@ void Interpreter::eval_frame() {
 
                 break;
 
+            case ByteCode::YIELD_VALUE:
+                // we are assured that we're in the progress
+                // of evalating generator.
+                _int_status = IS_YIELD;
+                _ret_value = TOP();
+                return;
+
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
         }
@@ -787,5 +801,24 @@ Interpreter::Status Interpreter::do_raise(HiObject* exc, HiObject* val, HiObject
     }
     _trace_back = tb;
     return IS_EXCEPTION;
+}
+
+HiObject* Interpreter::eval_generator(Generator* g) {
+    Handle handle(g);
+    enter_frame(g->frame());
+    g->frame()->set_entry_frame(true);
+    eval_frame();
+
+    if (_int_status != IS_YIELD) {
+        _int_status = IS_OK;
+        leave_frame();
+        ((Generator*)handle())->set_frame(NULL);
+        return NULL;
+    }
+
+    _int_status = IS_OK;
+    _frame = _frame->sender();
+
+    return _ret_value;
 }
 
