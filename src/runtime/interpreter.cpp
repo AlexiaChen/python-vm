@@ -498,11 +498,28 @@ void Interpreter::eval_frame() {
                     break;
 
                 case ByteCode::EXC_MATCH:
+                {
+                    bool found = false;
+                    Klass* k = ((HiTypeObject*)v)->own_klass();
+
                     if (v == w)
+                        found = true;
+                    else {
+                        for (int i = 0; i < k->mro()->size(); i++) {
+                            if (v->klass()->mro()->get(i) == w) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (found)
                         PUSH(Universe::HiTrue);
                     else
                         PUSH(Universe::HiFalse);
+
                     break;
+                }
 
                 default:
                     printf("Error: Unrecognized compare op %d\n", op_arg);

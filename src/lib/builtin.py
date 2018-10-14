@@ -58,3 +58,30 @@ class Exception(object):
 class StopIteration(Exception):
     pass
 
+def xrange(*alist):
+    start = 0
+    step = 1
+    if len(alist) == 1:
+        end = alist[0]
+    elif len(alist) == 2:
+        start = alist[0]
+        end = alist[1]
+    elif len(alist) == 3:
+        start = alist[0]
+        end = alist[1]
+        step = alist[2]
+
+    if (start < end and step > 0):
+        while start < end:
+            yield start
+            start += step
+    elif (start > end and step < 0):
+        while start > end:
+            yield start
+            start += step
+    else:
+        raise StopIteration
+
+    return
+
+
