@@ -242,3 +242,7 @@ void NativeFunctionKlass::oops_do(OopClosure* f, HiObject* obj) {
     f->do_array_list(&fo->_defaults);
 }
 
+HiObject* iter(ObjList args) {
+    return args->get(0)->iter();
+}
+

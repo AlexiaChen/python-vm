@@ -123,6 +123,7 @@ public:
 };
 
 HiObject* len(ObjList args);
+HiObject* iter(ObjList args);
 HiObject* type_of(ObjList args);
 HiObject* isinstance(ObjList args);
 HiObject* builtin_super(ObjList args);

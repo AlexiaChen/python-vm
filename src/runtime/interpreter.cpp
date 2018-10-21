@@ -55,6 +55,7 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("None"),     Universe::HiNone);
 
     _builtins->put(new HiString("len"),      new FunctionObject(len));
+    _builtins->put(new HiString("iter"),      new FunctionObject(iter));
     _builtins->put(new HiString("type"),     new FunctionObject(type_of));
     _builtins->put(new HiString("isinstance"),new FunctionObject(isinstance));
     _builtins->put(new HiString("super"),    new FunctionObject(builtin_super));
@@ -195,12 +196,18 @@ void Interpreter::eval_frame() {
     FunctionObject* fo;
     ArrayList<HiObject*>* args = NULL;
     HiObject *v, *w, *u;
+    unsigned char op_code;
+    bool has_argument;
+    int op_arg;
 
     while (_frame->has_more_codes()) {
-        unsigned char op_code = _frame->get_op_code();
-        bool has_argument = (op_code & 0xFF) >= ByteCode::HAVE_ARGUMENT;
+        if (_int_status != IS_OK)
+            goto fast_handle_exception;
 
-        int op_arg = -1;
+        op_code = _frame->get_op_code();
+        has_argument = (op_code & 0xFF) >= ByteCode::HAVE_ARGUMENT;
+
+        op_arg = -1;
         if (has_argument) {
             op_arg = _frame->get_op_arg();
         }
@@ -720,6 +727,7 @@ void Interpreter::eval_frame() {
                 printf("Error: Unrecognized byte code %d\n", op_code);
         }
 
+fast_handle_exception:
         while (_int_status != IS_OK && _frame->_loop_stack->size() != 0) {
             b = _frame->_loop_stack->get(_frame->_loop_stack->size()-1);
             if (_int_status == IS_CONTINUE && b->_type == ByteCode::SETUP_LOOP) {
@@ -809,7 +817,7 @@ Interpreter::Status Interpreter::do_raise(HiObject* exc, HiObject* val, HiObject
     }
 
     if (exc->klass() == TypeKlass::get_instance()) {
-        _pending_exception = call_virtual(_pending_exception, NULL);
+        _pending_exception = call_virtual(exc, NULL);
         _exception_class = exc;
     }
     else {
