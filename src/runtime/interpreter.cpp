@@ -6,6 +6,7 @@
 #include "runtime/module.hpp"
 #include "runtime/traceback.hpp"
 #include "runtime/generator.hpp"
+#include "runtime/cellObject.hpp"
 #include "util/arrayList.hpp"
 #include "util/map.hpp"
 #include "util/handles.hpp"
@@ -297,15 +298,25 @@ void Interpreter::eval_frame() {
 
             case ByteCode::LOAD_CLOSURE:
                 v = _frame->closure()->get(op_arg);
-                if (v != NULL) {
-                    PUSH(v);
-                    break;
+                if (v == NULL) {
+                    _frame->closure()->set(op_arg, (_frame->get_cell_from_parameter(op_arg)));
                 }
-                PUSH(_frame->get_cell_from_parameter(op_arg));
+
+                v = _frame->closure()->get(op_arg);
+                if (v->klass() == CellKlass::get_instance()) {
+                    PUSH(v);
+                }
+                else
+                    PUSH(new CellObject(_frame->closure(), op_arg));
+
                 break;
 
             case ByteCode::LOAD_DEREF:
-                PUSH(_frame->closure()->get(op_arg));
+                v = _frame->closure()->get(op_arg);
+                if (v->klass() == CellKlass::get_instance()) {
+                    v = ((CellObject*)v)->value();
+                }
+                PUSH(v);
                 break;
 
             case ByteCode::STORE_NAME:
