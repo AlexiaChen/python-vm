@@ -132,10 +132,7 @@ DictIteratorKlass<iter_type>::DictIteratorKlass() {
         "dictionary-valueiterator",
         "dictionary-itemiterator",
     };
-    HiDict* klass_dict = new HiDict();
-    klass_dict->put(StringTable::get_instance()->next_str, 
-            new FunctionObject(dict_iterator_next<iter_type>));
-    set_klass_dict(klass_dict);
+    set_klass_dict(new HiDict());
     set_name(new HiString(klass_names[iter_type]));
 }
 
@@ -225,8 +222,8 @@ HiObject* dict_iteritems(ObjList args) {
 }
 
 template<ITER_TYPE iter_type>
-HiObject* dict_iterator_next(ObjList args) {
-    DictIterator* iter = (DictIterator*)(args->get(0));
+HiObject* DictIteratorKlass<iter_type>::next(HiObject* x) {
+    DictIterator* iter = (DictIterator*)x;
 
     HiDict* adict = iter->owner();
     int iter_cnt = iter->iter_cnt();

@@ -71,6 +71,7 @@ private:
 public:
     static DictIteratorKlass* get_instance();
     virtual HiObject* iter(HiObject* x)  { return x; }
+    virtual HiObject* next(HiObject* x);
 };
 
 class DictIterator : public HiObject {
@@ -84,9 +85,5 @@ public:
     int iter_cnt()         { return _iter_cnt; }  
     void inc_cnt()         { _iter_cnt++; }
 };
-
-template<ITER_TYPE iter_type>
-HiObject* dict_iterator_next(ObjList args);
-
 #endif
 

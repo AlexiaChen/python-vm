@@ -218,6 +218,15 @@ bool MethodObject::is_function(HiObject *x) {
     return false;
 }
 
+bool MethodObject::is_yield_function(HiObject *x) {
+    Klass* k = x->klass();
+    if (k != (Klass*) FunctionKlass::get_instance())
+        return false;
+
+    FunctionObject* fo = (FunctionObject*)x;
+    return ((fo->flags() & FunctionObject::CO_GENERATOR) != 0);
+}
+
 size_t NativeFunctionKlass::size() {
     return sizeof(FunctionObject);
 }
@@ -231,5 +240,9 @@ void NativeFunctionKlass::oops_do(OopClosure* f, HiObject* obj) {
     f->do_oop((HiObject**)&fo->_globals);
     f->do_oop((HiObject**)&fo->_closure);
     f->do_array_list(&fo->_defaults);
+}
+
+HiObject* iter(ObjList args) {
+    return args->get(0)->iter();
 }
 

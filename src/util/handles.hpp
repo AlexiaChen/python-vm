@@ -5,6 +5,8 @@ class HiObject;
 class OopClosure;
 
 class Handle {
+friend class HandleMark;
+private:
     HiObject* _value;
     Handle*   _next;
 
@@ -14,11 +16,11 @@ public:
 
     void oops_do(OopClosure* f);
     HiObject* operator ->();
+    HiObject* operator ()()   { return _value; }
     HiObject* resolve();
 };
 
 class HandleMark {
-friend class Handle;
 private:
     static HandleMark* instance;
     Handle* _head;
@@ -28,6 +30,8 @@ public:
 
     static HandleMark* get_instance();
     void oops_do(OopClosure* f);
+    Handle* head()               { return _head; }
+    void set_head(Handle* x)     { _head = x; }
 };
 
 #endif

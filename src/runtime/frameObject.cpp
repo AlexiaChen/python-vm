@@ -181,6 +181,20 @@ HiString* FrameObject::func_name() {
 }
 
 int FrameObject::lineno() {
-    return _pc;
+    int pc_offset = 0;
+    int line_no = _codes->_lineno;
+
+    const char* lnotab = _codes->_notable->value();
+    int length = _codes->_notable->length();
+
+    for (int i = 0; i < length; i++) {
+        pc_offset += lnotab[i++];
+        if (pc_offset >= _pc)
+            return line_no;
+
+        line_no += lnotab[i];
+    }
+
+    return line_no;
 }
 

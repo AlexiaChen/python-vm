@@ -8,6 +8,7 @@ class FrameObject;
 class HiDict;
 class OopClosure;
 class ModuleObject;
+class Generator;
 
 class Interpreter {
     enum Status {
@@ -16,6 +17,7 @@ class Interpreter {
         IS_CONTINUE,
         IS_EXCEPTION,
         IS_RETURN,
+        IS_YIELD,
     };
 
 private:
@@ -44,6 +46,7 @@ public:
     void      enter_frame     (FrameObject* frame);
     void      eval_frame      ();
     void      leave_frame     ();
+    HiObject* eval_generator  (Generator* g);
     HiObject* call_virtual    (HiObject* func, ObjList args);
     Status    do_raise        (HiObject* exc, HiObject* val, HiObject* tb);
 

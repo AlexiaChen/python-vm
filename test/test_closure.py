@@ -23,3 +23,27 @@ f()
 f, g = f()
 f()
 g()
+
+def func(x = 5):
+    def say():
+        print x
+
+    x = 3
+    print x
+    return say
+
+f = func()
+print "hello"
+f()
+
+def foo():
+    x = 2
+    def bar():
+        print x
+
+    x = 3
+
+    return bar
+
+f = foo()
+f()

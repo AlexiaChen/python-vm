@@ -107,6 +107,7 @@ public:
     FunctionObject* func()         { return _func; }
 
     static bool is_function(HiObject* x);
+    static bool is_yield_function(HiObject* x);
 };
 
 class NativeFunctionKlass : public Klass {
@@ -122,6 +123,7 @@ public:
 };
 
 HiObject* len(ObjList args);
+HiObject* iter(ObjList args);
 HiObject* type_of(ObjList args);
 HiObject* isinstance(ObjList args);
 HiObject* builtin_super(ObjList args);

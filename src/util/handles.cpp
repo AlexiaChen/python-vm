@@ -1,32 +1,40 @@
 #include "util/handles.hpp"
 #include "memory/oopClosure.hpp"
 
-HandleMark* HandleMark::instance = new HandleMark();
+#include <stdio.h>
+
+HandleMark* HandleMark::instance = NULL;
 
 HandleMark::HandleMark() {
     _head = 0x0;
 }
 
 HandleMark* HandleMark::get_instance() {
+    if (!instance)
+        instance = new HandleMark();
+
     return instance;
 }
 
 void HandleMark::oops_do(OopClosure* f) {
-    if (_head)
-        _head->oops_do(f);
+    Handle* cur = _head;
+    while (cur) {
+        cur->oops_do(f);
+        cur = cur->_next;
+    }
 }
 
 Handle::Handle(HiObject* t) {
     _value = t;
 
-    _next = HandleMark::instance->_head;
-    HandleMark::instance->_head = this;
+    _next = HandleMark::get_instance()->head();
+    HandleMark::get_instance()->set_head(this);
 }
 
 Handle::~Handle() {
     _value = 0x0;
     
-    HandleMark::instance->_head = _next;
+    HandleMark::get_instance()->set_head(_next);
     _next = 0x0;
 }
 

@@ -23,6 +23,8 @@ ADD_EXECUTABLE(railgun main.cpp
     runtime/stringTable.cpp
     runtime/module.cpp
     runtime/traceback.cpp
+    runtime/generator.cpp
+    runtime/cellObject.cpp
     memory/heap.cpp
     memory/oopClosure.cpp
     code/binaryFileParser.cpp
