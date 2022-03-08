@@ -242,6 +242,7 @@ HiObject* list_remove(ObjList args) {
     for (int i = 0; i < list->inner_list()->size(); i++) {
         if (list->get(i)->equal(target) == (HiObject*)Universe::HiTrue) {
             list->inner_list()->delete_index(i);
+	    return Universe::HiNone;
         }
     }
 
